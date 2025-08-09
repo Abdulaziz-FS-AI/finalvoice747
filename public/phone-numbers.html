@@ -384,7 +384,7 @@
             </div>
             <div style="display: flex; align-items: center; gap: 16px;">
                 <span style="color: #ccc; font-size: 14px;" id="userEmailNav">Loading...</span>
-                <button style="background: #ef4444; color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: 500;" onclick="signOutNav()">Sign Out</button>
+                <button style="background: #ef4444; color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: 500;" onclick="signOut()">Sign Out</button>
             </div>
         </div>
     </nav>
@@ -639,7 +639,7 @@ phone_numbers table:
         }
         
         // Navigation sign out
-        async function signOutNav() {
+        async function signOut() {
             try {
                 const response = await fetch('/api/config/auth');
                 const config = await response.json();

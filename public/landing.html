@@ -1073,7 +1073,32 @@
         </div>
     </section>
 
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
+        // Check for authenticated user and redirect to dashboard
+        async function checkAuthOnLanding() {
+            try {
+                const response = await fetch('/api/config/auth');
+                if (response.ok) {
+                    const config = await response.json();
+                    const supabaseClient = window.supabase.createClient(config.supabaseUrl, config.supabaseAnonKey);
+                    
+                    const { data: { user } } = await supabaseClient.auth.getUser();
+                    if (user) {
+                        console.log('User is already authenticated, redirecting to dashboard');
+                        window.location.href = '/dashboard';
+                        return;
+                    }
+                }
+            } catch (error) {
+                console.log('Auth check failed:', error);
+                // Continue with normal landing page
+            }
+        }
+        
+        // Run auth check immediately
+        checkAuthOnLanding();
+
         // Mouse tracking for gradient effect
         document.addEventListener('mousemove', (e) => {
             const x = e.clientX;

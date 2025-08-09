@@ -36,6 +36,10 @@
       "dest": "/server-fixed.js"
     },
     {
+      "src": "/create-assistant",
+      "dest": "/server-fixed.js"
+    },
+    {
       "src": "/",
       "dest": "/server-fixed.js"
     },

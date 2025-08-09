@@ -80,6 +80,17 @@ app.get('/analytics', (req, res) => {
     });
 });
 
+// Create Assistant route (index.html)
+app.get('/create-assistant', (req, res) => {
+    console.log('➕ Serving assistant creation page');
+    res.sendFile(path.join(__dirname, 'public', 'index.html'), (err) => {
+        if (err) {
+            console.error('❌ Error serving assistant creation page:', err);
+            res.status(500).send('Error loading assistant creation page');
+        }
+    });
+});
+
 app.use(express.static('public'));
 
 console.log('✅ Basic middleware configured');
