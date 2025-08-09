@@ -301,7 +301,7 @@
             const { data: { user } } = await supabaseClient.auth.getUser()
             if (user) {
                 // Already logged in, redirect to dashboard
-                window.location.href = '/dashboard.html'
+                window.location.href = '/dashboard'
             }
         }
         
@@ -312,7 +312,7 @@
                 const { error } = await supabaseClient.auth.signInWithOAuth({
                     provider: 'google',
                     options: {
-                        redirectTo: window.location.origin + '/dashboard.html'
+                        redirectTo: window.location.origin + '/dashboard'
                     }
                 })
                 
@@ -342,7 +342,7 @@
                         email,
                         password,
                         options: {
-                            emailRedirectTo: window.location.origin + '/dashboard.html'
+                            emailRedirectTo: window.location.origin + '/dashboard'
                         }
                     })
                 } else {
@@ -358,10 +358,10 @@
                 if (isSignUp && result.data.user) {
                     showSuccess('Account created! Signing you in...')
                     setTimeout(() => {
-                        window.location.href = '/dashboard.html'
+                        window.location.href = '/dashboard'
                     }, 1000)
                 } else if (result.data.user) {
-                    window.location.href = '/dashboard.html'
+                    window.location.href = '/dashboard'
                 }
                 
             } catch (error) {
