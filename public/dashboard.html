@@ -3,447 +3,444 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard - Voice AI Demo</title>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <title>Dashboard - Voice Matrix AI</title>
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Design System -->
+    <link rel="stylesheet" href="/css/design-system.css">
+    
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
+        .dashboard-header {
+            padding: var(--space-8) 0;
+            background: var(--bg-primary);
+            border-bottom: 1px solid var(--border-default);
         }
         
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: #f9fafb;
-            color: #111827;
-            line-height: 1.6;
+        .dashboard-title {
+            margin-bottom: var(--space-2);
         }
         
-        /* Navigation */
-        .nav-container {
-            background: white;
-            border-bottom: 1px solid #e5e7eb;
-            position: sticky;
-            top: 0;
-            z-index: 100;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        .dashboard-subtitle {
+            color: var(--text-secondary);
         }
         
-        .nav-content {
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 0 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            height: 64px;
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: var(--space-6);
+            margin-bottom: var(--space-8);
         }
         
-        .nav-brand {
-            font-size: 20px;
-            font-weight: 600;
-            color: #111827;
-            text-decoration: none;
-        }
-        
-        .nav-tabs {
-            display: flex;
-            gap: 8px;
-        }
-        
-        .nav-tab {
-            padding: 8px 16px;
-            color: #6b7280;
-            text-decoration: none;
-            border-radius: 6px;
-            font-weight: 500;
-            transition: all 0.2s;
+        .stat-card {
+            background: var(--bg-primary);
+            border: 1px solid var(--border-default);
+            border-radius: var(--radius-lg);
+            padding: var(--space-6);
+            transition: all var(--transition-normal);
             position: relative;
+            overflow: hidden;
         }
         
-        .nav-tab:hover {
-            background: #f3f4f6;
-            color: #111827;
-        }
-        
-        .nav-tab.active {
-            color: #2563eb;
-        }
-        
-        .nav-tab.active::after {
+        .stat-card::before {
             content: '';
             position: absolute;
-            bottom: -17px;
+            top: 0;
             left: 0;
-            right: 0;
-            height: 2px;
-            background: #2563eb;
+            width: 4px;
+            height: 100%;
+            background: var(--color-primary);
+            border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
         }
         
-        .user-menu {
+        .stat-card:hover {
+            box-shadow: var(--shadow-md);
+            transform: translateY(-2px);
+        }
+        
+        .stat-card.success::before { background: var(--color-success); }
+        .stat-card.warning::before { background: var(--color-warning); }
+        .stat-card.info::before { background: var(--color-info); }
+        .stat-card.purple::before { background: var(--color-purple); }
+        
+        .stat-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: var(--space-4);
+        }
+        
+        .stat-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: var(--radius-lg);
             display: flex;
             align-items: center;
-            gap: 16px;
-        }
-        
-        .user-email {
-            color: #6b7280;
-            font-size: 14px;
-        }
-        
-        .sign-out-btn {
-            background: #ef4444;
+            justify-content: center;
             color: white;
-            border: none;
-            padding: 8px 16px;
-            border-radius: 6px;
-            cursor: pointer;
+        }
+        
+        .stat-icon.primary { background: var(--color-primary); }
+        .stat-icon.success { background: var(--color-success); }
+        .stat-icon.warning { background: var(--color-warning); }
+        .stat-icon.purple { background: var(--color-purple); }
+        
+        .stat-number {
+            font-size: 28px;
+            font-weight: var(--font-weight-bold);
+            color: var(--text-primary);
+            margin-bottom: var(--space-1);
+        }
+        
+        .stat-label {
+            color: var(--text-secondary);
             font-size: 14px;
-            font-weight: 500;
-            transition: all 0.2s;
+            font-weight: var(--font-weight-medium);
         }
         
-        .sign-out-btn:hover {
-            background: #dc2626;
+        .stat-change {
+            font-size: 12px;
+            font-weight: var(--font-weight-medium);
+            display: flex;
+            align-items: center;
+            gap: var(--space-1);
         }
         
-        /* Main Content */
-        .container {
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 32px 20px;
-        }
+        .stat-change.positive { color: var(--color-success); }
+        .stat-change.negative { color: var(--color-error); }
         
-        .page-header {
-            text-align: center;
-            margin-bottom: 48px;
-        }
-        
-        .page-title {
-            font-size: 36px;
-            font-weight: 700;
-            color: #111827;
-            margin-bottom: 8px;
-        }
-        
-        .page-subtitle {
-            color: #6b7280;
-            font-size: 18px;
-        }
-        
-        /* Quick Actions */
         .quick-actions {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 24px;
-            margin-bottom: 48px;
+            gap: var(--space-6);
+            margin-bottom: var(--space-8);
         }
         
         .action-card {
-            background: white;
-            border-radius: 12px;
-            padding: 32px;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-            border: 1px solid #e5e7eb;
+            background: var(--bg-primary);
+            border: 1px solid var(--border-default);
+            border-radius: var(--radius-lg);
+            padding: var(--space-6);
             text-align: center;
-            transition: all 0.2s ease;
+            transition: all var(--transition-normal);
             cursor: pointer;
             text-decoration: none;
             color: inherit;
         }
         
         .action-card:hover {
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            box-shadow: var(--shadow-md);
             transform: translateY(-2px);
+            border-color: var(--color-primary);
         }
         
         .action-icon {
-            width: 64px;
-            height: 64px;
-            margin: 0 auto 16px;
-            padding: 16px;
-            border-radius: 12px;
+            width: 56px;
+            height: 56px;
+            border-radius: var(--radius-lg);
             display: flex;
             align-items: center;
             justify-content: center;
+            margin: 0 auto var(--space-4);
+            color: white;
         }
         
-        .action-icon.blue {
-            background: #dbeafe;
-            color: #1e40af;
+        .action-icon.primary { 
+            background: linear-gradient(135deg, var(--color-primary), var(--color-secondary)); 
         }
-        
-        .action-icon.green {
-            background: #d1fae5;
-            color: #065f46;
+        .action-icon.success { 
+            background: linear-gradient(135deg, var(--color-success), var(--color-emerald)); 
         }
-        
-        .action-icon.purple {
-            background: #e0e7ff;
-            color: #3730a3;
+        .action-icon.warning { 
+            background: linear-gradient(135deg, var(--color-warning), #F97316); 
         }
-        
-        .action-icon.orange {
-            background: #fed7aa;
-            color: #9a3412;
+        .action-icon.purple { 
+            background: linear-gradient(135deg, var(--color-purple), #A855F7); 
         }
         
         .action-title {
-            font-size: 20px;
-            font-weight: 600;
-            color: #111827;
-            margin-bottom: 8px;
+            font-size: 18px;
+            font-weight: var(--font-weight-semibold);
+            margin-bottom: var(--space-2);
+            color: var(--text-primary);
         }
         
         .action-description {
-            color: #6b7280;
+            color: var(--text-secondary);
             font-size: 14px;
+            line-height: 1.5;
         }
         
-        /* Recent Activity */
         .recent-activity {
-            background: white;
-            border-radius: 12px;
-            padding: 32px;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-            border: 1px solid #e5e7eb;
+            background: var(--bg-primary);
+            border: 1px solid var(--border-default);
+            border-radius: var(--radius-lg);
+            overflow: hidden;
         }
         
-        .section-header {
+        .activity-header {
+            padding: var(--space-6);
+            border-bottom: 1px solid var(--border-default);
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 24px;
         }
         
-        .section-title {
-            font-size: 24px;
-            font-weight: 600;
-            color: #111827;
-        }
-        
-        .view-all-btn {
-            color: #2563eb;
-            text-decoration: none;
-            font-weight: 500;
-            font-size: 14px;
-        }
-        
-        .view-all-btn:hover {
-            text-decoration: underline;
+        .activity-content {
+            padding: var(--space-6);
         }
         
         .activity-item {
             display: flex;
             align-items: center;
-            gap: 16px;
-            padding: 16px 0;
-            border-bottom: 1px solid #f3f4f6;
+            gap: var(--space-4);
+            padding: var(--space-4) 0;
+            border-bottom: 1px solid var(--border-default);
         }
         
         .activity-item:last-child {
             border-bottom: none;
         }
         
-        .activity-icon {
+        .activity-item-icon {
             width: 40px;
             height: 40px;
-            border-radius: 8px;
+            border-radius: var(--radius-md);
             display: flex;
             align-items: center;
             justify-content: center;
+            color: white;
             flex-shrink: 0;
         }
         
-        .activity-icon.call {
-            background: #dbeafe;
-            color: #1e40af;
-        }
+        .activity-item-icon.call { background: var(--color-primary); }
+        .activity-item-icon.assistant { background: var(--color-success); }
+        .activity-item-icon.phone { background: var(--color-warning); }
         
-        .activity-icon.assistant {
-            background: #d1fae5;
-            color: #065f46;
-        }
-        
-        .activity-icon.phone {
-            background: #fed7aa;
-            color: #9a3412;
-        }
-        
-        .activity-content {
+        .activity-item-content {
             flex: 1;
+            min-width: 0;
         }
         
-        .activity-title {
-            font-weight: 500;
-            color: #111827;
-            margin-bottom: 2px;
+        .activity-item-title {
+            font-weight: var(--font-weight-medium);
+            color: var(--text-primary);
+            margin-bottom: var(--space-1);
         }
         
-        .activity-time {
-            color: #6b7280;
+        .activity-item-time {
+            color: var(--text-secondary);
             font-size: 12px;
         }
         
         .empty-state {
             text-align: center;
-            padding: 48px 20px;
-            color: #6b7280;
+            padding: var(--space-12) var(--space-4);
+            color: var(--text-secondary);
         }
         
-        .empty-state svg {
-            width: 48px;
-            height: 48px;
-            margin: 0 auto 16px;
-            opacity: 0.3;
+        .empty-state-icon {
+            width: 64px;
+            height: 64px;
+            margin: 0 auto var(--space-4);
+            opacity: 0.5;
         }
         
-        /* Loading State */
-        .loading {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 200px;
-            color: #6b7280;
-        }
-        
-        .loading-spinner {
-            border: 3px solid #f3f4f6;
-            border-top: 3px solid #3b82f6;
-            border-radius: 50%;
-            width: 32px;
-            height: 32px;
-            animation: spin 1s linear infinite;
-            margin-right: 12px;
-        }
-        
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-        
-        /* Responsive */
         @media (max-width: 768px) {
-            .nav-content {
-                flex-direction: column;
-                height: auto;
-                padding: 16px 20px;
-                gap: 16px;
-            }
-            
-            .nav-tabs {
-                order: 2;
-                width: 100%;
-                justify-content: center;
-                flex-wrap: wrap;
-            }
-            
-            .user-menu {
-                order: 1;
-                width: 100%;
-                justify-content: space-between;
-            }
-            
-            .nav-brand {
-                display: none;
-            }
-            
-            .page-title {
-                font-size: 28px;
+            .stats-grid {
+                grid-template-columns: 1fr;
+                gap: var(--space-4);
             }
             
             .quick-actions {
                 grid-template-columns: 1fr;
+                gap: var(--space-4);
             }
             
-            .action-card {
-                padding: 24px;
+            .dashboard-header {
+                padding: var(--space-6) 0;
             }
         }
     </style>
+    
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
     <!-- Navigation -->
-    <nav class="nav-container">
+    <nav class="nav">
         <div class="nav-content">
-            <a href="/dashboard" class="nav-brand">Voice AI Demo</a>
+            <a href="/dashboard" class="nav-brand">Voice Matrix AI</a>
             <div class="nav-tabs">
                 <a href="/dashboard" class="nav-tab active">Dashboard</a>
                 <a href="/assistants" class="nav-tab">Assistants</a>
                 <a href="/phone-numbers" class="nav-tab">Phone Numbers</a>
                 <a href="/analytics" class="nav-tab">Analytics</a>
             </div>
-            <div class="user-menu">
-                <span class="user-email" id="userEmail">Loading...</span>
-                <button class="sign-out-btn" onclick="signOut()">Sign Out</button>
+            <div class="nav-user">
+                <span class="nav-user-email" id="userEmail">Loading...</span>
+                <button class="btn btn-danger btn-sm" onclick="signOut()">Sign Out</button>
             </div>
         </div>
     </nav>
 
-    <div class="container">
-        <div class="page-header">
-            <h1 class="page-title">Welcome to Voice AI</h1>
-            <p class="page-subtitle">Manage your AI assistants, phone numbers, and view analytics</p>
+    <!-- Dashboard Header -->
+    <section class="dashboard-header">
+        <div class="container">
+            <h1 class="text-h1 dashboard-title">Welcome back!</h1>
+            <p class="text-lg dashboard-subtitle">Here's what's happening with your Voice AI assistants</p>
         </div>
+    </section>
 
-        <!-- Quick Actions -->
-        <div class="quick-actions">
-            <a href="/create-assistant" class="action-card">
-                <div class="action-icon blue">
-                    <svg width="32" height="32" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
-                    </svg>
+    <!-- Main Dashboard Content -->
+    <main class="section">
+        <div class="container">
+            <!-- Stats Overview -->
+            <div class="stats-grid">
+                <div class="stat-card primary">
+                    <div class="stat-header">
+                        <div>
+                            <div class="stat-number" id="totalCalls">-</div>
+                            <div class="stat-label">Total Calls</div>
+                        </div>
+                        <div class="stat-icon primary">
+                            <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path>
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="stat-change positive" id="callsChange">
+                        <svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 17l9.2-9.2M17 17V7H7"></path>
+                        </svg>
+                        Loading...
+                    </div>
                 </div>
-                <div class="action-title">Create Assistant</div>
-                <div class="action-description">Set up a new AI voice assistant with custom prompts and settings</div>
-            </a>
 
-            <a href="/assistants" class="action-card">
-                <div class="action-icon green">
-                    <svg width="32" height="32" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
-                    </svg>
+                <div class="stat-card success">
+                    <div class="stat-header">
+                        <div>
+                            <div class="stat-number" id="activeAssistants">-</div>
+                            <div class="stat-label">Active Assistants</div>
+                        </div>
+                        <div class="stat-icon success">
+                            <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="stat-change positive" id="assistantsChange">
+                        <svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 17l9.2-9.2M17 17V7H7"></path>
+                        </svg>
+                        Loading...
+                    </div>
                 </div>
-                <div class="action-title">Manage Assistants</div>
-                <div class="action-description">View, edit, and delete your existing AI assistants</div>
-            </a>
 
-            <a href="/phone-numbers" class="action-card">
-                <div class="action-icon orange">
-                    <svg width="32" height="32" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path>
-                    </svg>
+                <div class="stat-card warning">
+                    <div class="stat-header">
+                        <div>
+                            <div class="stat-number" id="phoneNumbers">-</div>
+                            <div class="stat-label">Phone Numbers</div>
+                        </div>
+                        <div class="stat-icon warning">
+                            <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z"></path>
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="stat-change positive" id="phoneNumbersChange">
+                        <svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 17l9.2-9.2M17 17V7H7"></path>
+                        </svg>
+                        Loading...
+                    </div>
                 </div>
-                <div class="action-title">Phone Numbers</div>
-                <div class="action-description">Add and configure Twilio phone numbers for your assistants</div>
-            </a>
 
-            <a href="/analytics" class="action-card">
-                <div class="action-icon purple">
-                    <svg width="32" height="32" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
-                    </svg>
+                <div class="stat-card purple">
+                    <div class="stat-header">
+                        <div>
+                            <div class="stat-number" id="avgDuration">-</div>
+                            <div class="stat-label">Avg Call Duration</div>
+                        </div>
+                        <div class="stat-icon purple">
+                            <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="stat-change positive" id="durationChange">
+                        <svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 17l9.2-9.2M17 17V7H7"></path>
+                        </svg>
+                        Loading...
+                    </div>
                 </div>
-                <div class="action-title">View Analytics</div>
-                <div class="action-description">Monitor call metrics, usage, and performance analytics</div>
-            </a>
-        </div>
-
-        <!-- Recent Activity -->
-        <div class="recent-activity">
-            <div class="section-header">
-                <h2 class="section-title">Recent Activity</h2>
-                <a href="/analytics" class="view-all-btn">View All</a>
             </div>
-            
-            <div id="activityContent">
-                <div class="loading">
-                    <div class="loading-spinner"></div>
-                    <div>Loading recent activity...</div>
+
+            <!-- Quick Actions -->
+            <div class="mb-8">
+                <h2 class="text-h3 mb-6">Quick Actions</h2>
+                <div class="quick-actions">
+                    <a href="/create-assistant" class="action-card">
+                        <div class="action-icon primary">
+                            <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                            </svg>
+                        </div>
+                        <h3 class="action-title">Create Assistant</h3>
+                        <p class="action-description">Set up a new AI voice assistant with custom prompts and settings</p>
+                    </a>
+
+                    <a href="/assistants" class="action-card">
+                        <div class="action-icon success">
+                            <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
+                            </svg>
+                        </div>
+                        <h3 class="action-title">Manage Assistants</h3>
+                        <p class="action-description">View, edit, and configure your existing AI assistants</p>
+                    </a>
+
+                    <a href="/phone-numbers" class="action-card">
+                        <div class="action-icon warning">
+                            <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path>
+                            </svg>
+                        </div>
+                        <h3 class="action-title">Phone Numbers</h3>
+                        <p class="action-description">Add and configure Twilio phone numbers for your assistants</p>
+                    </a>
+
+                    <a href="/analytics" class="action-card">
+                        <div class="action-icon purple">
+                            <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                            </svg>
+                        </div>
+                        <h3 class="action-title">View Analytics</h3>
+                        <p class="action-description">Monitor call metrics, usage, and performance analytics</p>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Recent Activity -->
+            <div class="recent-activity">
+                <div class="activity-header">
+                    <h2 class="text-h3">Recent Activity</h2>
+                    <a href="/analytics" class="btn btn-text">View All</a>
+                </div>
+                <div class="activity-content" id="activityContent">
+                    <div class="loading" style="display: flex; justify-content: center; padding: var(--space-8);">
+                        <div class="loading-spinner"></div>
+                        <span class="text-secondary" style="margin-left: var(--space-3);">Loading recent activity...</span>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
+    </main>
 
     <script>
         // Global variables
@@ -459,7 +456,8 @@
             // Update UI with user info
             document.getElementById('userEmail').textContent = currentUser.email;
 
-            // Load recent activity
+            // Load dashboard data
+            await loadDashboardData();
             await loadRecentActivity();
         }
 
@@ -475,7 +473,7 @@
                     throw new Error(config.message || 'Failed to load auth config');
                 }
             } catch (error) {
-                alert('Failed to initialize authentication: ' + error.message);
+                console.error('Failed to initialize authentication:', error);
             }
         }
 
@@ -485,7 +483,7 @@
 
             const { data: { user } } = await supabase.auth.getUser();
             if (!user) {
-                window.location.href = '/auth.html';
+                window.location.href = '/auth';
                 return null;
             }
             return user;
@@ -495,14 +493,14 @@
         async function signOut() {
             if (!supabase) return;
             await supabase.auth.signOut();
-            window.location.href = '/auth.html';
+            window.location.href = '/auth';
         }
 
         // Authenticated fetch helper
         async function authenticatedFetch(url, options = {}) {
             const { data: { session } } = await supabase.auth.getSession();
             if (!session) {
-                window.location.href = '/auth.html';
+                window.location.href = '/auth';
                 return null;
             }
 
@@ -516,6 +514,75 @@
             });
 
             return response;
+        }
+
+        // Load dashboard data
+        async function loadDashboardData() {
+            try {
+                const response = await authenticatedFetch('/api/analytics/dashboard');
+                if (!response || !response.ok) {
+                    throw new Error('Failed to load dashboard data');
+                }
+
+                const result = await response.json();
+                if (!result.success) {
+                    throw new Error(result.error || 'Failed to load dashboard data');
+                }
+
+                const data = result.data;
+                updateStats(data);
+
+            } catch (error) {
+                console.error('Error loading dashboard data:', error);
+                // Set default values
+                document.getElementById('totalCalls').textContent = '0';
+                document.getElementById('activeAssistants').textContent = '0';
+                document.getElementById('phoneNumbers').textContent = '0';
+                document.getElementById('avgDuration').textContent = '0m';
+                
+                // Update change indicators
+                document.getElementById('callsChange').textContent = 'No data';
+                document.getElementById('assistantsChange').textContent = 'No data';
+                document.getElementById('phoneNumbersChange').textContent = 'No data';
+                document.getElementById('durationChange').textContent = 'No data';
+            }
+        }
+
+        // Update stats display
+        function updateStats(data) {
+            document.getElementById('totalCalls').textContent = data.totalCalls || '0';
+            document.getElementById('activeAssistants').textContent = data.activeAssistants || '0';
+            document.getElementById('phoneNumbers').textContent = data.phoneNumbers || '0';
+            document.getElementById('avgDuration').textContent = data.avgDuration || '0m';
+            
+            // Update change indicators (you can add logic for actual percentage changes)
+            document.getElementById('callsChange').innerHTML = `
+                <svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 17l9.2-9.2M17 17V7H7"></path>
+                </svg>
+                +${data.callsGrowth || '0'}% from last month
+            `;
+            
+            document.getElementById('assistantsChange').innerHTML = `
+                <svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 17l9.2-9.2M17 17V7H7"></path>
+                </svg>
+                +${data.assistantsGrowth || '0'}% this week
+            `;
+            
+            document.getElementById('phoneNumbersChange').innerHTML = `
+                <svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 17l9.2-9.2M17 17V7H7"></path>
+                </svg>
+                +${data.numbersGrowth || '0'}% active
+            `;
+            
+            document.getElementById('durationChange').innerHTML = `
+                <svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 17l9.2-9.2M17 17V7H7"></path>
+                </svg>
+                +${data.durationGrowth || '0'}% avg
+            `;
         }
 
         // Load recent activity
@@ -534,13 +601,13 @@
                 }
 
                 const data = result.data;
-                renderRecentActivity(data.callHistory.slice(0, 5)); // Show last 5 activities
+                renderRecentActivity(data.callHistory?.slice(0, 5) || []); // Show last 5 activities
 
             } catch (error) {
                 console.error('Error loading recent activity:', error);
                 activityContent.innerHTML = `
                     <div class="empty-state">
-                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg class="empty-state-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                         </svg>
                         <p>Unable to load recent activity</p>
@@ -556,7 +623,7 @@
             if (activities.length === 0) {
                 activityContent.innerHTML = `
                     <div class="empty-state">
-                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg class="empty-state-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
                         </svg>
                         <p>No recent activity. Start by creating an assistant!</p>
@@ -567,14 +634,14 @@
 
             const activityHTML = activities.map(activity => `
                 <div class="activity-item">
-                    <div class="activity-icon call">
+                    <div class="activity-item-icon call">
                         <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path>
                         </svg>
                     </div>
-                    <div class="activity-content">
-                        <div class="activity-title">Call ${activity.status} - ${activity.duration}</div>
-                        <div class="activity-time">${formatTimeAgo(activity.startedAt)}</div>
+                    <div class="activity-item-content">
+                        <div class="activity-item-title">Call ${activity.status} - ${activity.duration}</div>
+                        <div class="activity-item-time">${formatTimeAgo(activity.startedAt)}</div>
                     </div>
                 </div>
             `).join('');
@@ -597,8 +664,24 @@
             return 'Just now';
         }
 
-        // Initialize on load
-        window.addEventListener('load', init);
+        // Add loading animations
+        document.addEventListener('DOMContentLoaded', () => {
+            // Stagger animations for stats cards
+            const statCards = document.querySelectorAll('.stat-card');
+            statCards.forEach((card, index) => {
+                card.style.opacity = '0';
+                card.style.transform = 'translateY(20px)';
+                card.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+                
+                setTimeout(() => {
+                    card.style.opacity = '1';
+                    card.style.transform = 'translateY(0)';
+                }, index * 100);
+            });
+
+            // Initialize the app
+            init();
+        });
     </script>
 </body>
 </html>
