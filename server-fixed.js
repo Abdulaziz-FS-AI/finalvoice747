@@ -25,6 +25,17 @@ app.get('/', (req, res) => {
     });
 });
 
+// Auth route
+app.get('/auth', (req, res) => {
+    console.log('🔐 Serving auth page');
+    res.sendFile(path.join(__dirname, 'public', 'auth.html'), (err) => {
+        if (err) {
+            console.error('❌ Error serving auth page:', err);
+            res.status(500).send('Error loading auth page');
+        }
+    });
+});
+
 app.use(express.static('public'));
 
 console.log('✅ Basic middleware configured');
