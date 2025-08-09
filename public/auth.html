@@ -280,6 +280,14 @@
                 const config = await response.json()
                 supabaseClient = createClient(config.supabaseUrl, config.supabaseAnonKey)
                 
+                // Listen for auth state changes (handles OAuth redirects)
+                supabaseClient.auth.onAuthStateChange((event, session) => {
+                    if (event === 'SIGNED_IN' && session) {
+                        console.log('User signed in, redirecting to dashboard')
+                        window.location.href = '/dashboard'
+                    }
+                })
+                
                 // Now check existing auth
                 checkExistingAuth()
             } catch (error) {
