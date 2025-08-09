@@ -36,6 +36,17 @@ app.get('/auth', (req, res) => {
     });
 });
 
+// Dashboard route
+app.get('/dashboard', (req, res) => {
+    console.log('📊 Serving dashboard page');
+    res.sendFile(path.join(__dirname, 'public', 'dashboard.html'), (err) => {
+        if (err) {
+            console.error('❌ Error serving dashboard page:', err);
+            res.status(500).send('Error loading dashboard page');
+        }
+    });
+});
+
 app.use(express.static('public'));
 
 console.log('✅ Basic middleware configured');
@@ -129,11 +140,6 @@ try {
 }
 
 console.log(`📊 Loaded ${apiRoutesLoaded}/5 API route modules`);
-
-// Core routes
-app.get('/dashboard', (req, res) => {
-    res.redirect('/dashboard.html');
-});
 
 // Health check
 app.get('/health', (req, res) => {
