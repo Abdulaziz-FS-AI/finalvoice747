@@ -258,6 +258,23 @@
     </style>
 </head>
 <body>
+    <!-- Navigation -->
+    <nav style="background: white; border-bottom: 1px solid #333; position: sticky; top: 0; z-index: 100; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);">
+        <div style="max-width: 1200px; margin: 0 auto; padding: 0 20px; display: flex; justify-content: space-between; align-items: center; height: 64px;">
+            <a href="/dashboard" style="font-size: 20px; font-weight: 600; color: #111827; text-decoration: none;">Voice AI Demo</a>
+            <div style="display: flex; gap: 8px;">
+                <a href="/dashboard" style="padding: 8px 16px; color: #6b7280; text-decoration: none; border-radius: 6px; font-weight: 500; transition: all 0.2s;">Dashboard</a>
+                <a href="/assistants" style="padding: 8px 16px; color: #6b7280; text-decoration: none; border-radius: 6px; font-weight: 500; transition: all 0.2s;">Assistants</a>
+                <a href="/phone-numbers" style="padding: 8px 16px; color: #6b7280; text-decoration: none; border-radius: 6px; font-weight: 500; transition: all 0.2s;">Phone Numbers</a>
+                <a href="/analytics" style="padding: 8px 16px; color: #6b7280; text-decoration: none; border-radius: 6px; font-weight: 500; transition: all 0.2s;">Analytics</a>
+            </div>
+            <div style="display: flex; align-items: center; gap: 16px;">
+                <span style="color: #6b7280; font-size: 14px;" id="userEmail">Loading...</span>
+                <button style="background: #ef4444; color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: 500;" onclick="signOut()">Sign Out</button>
+            </div>
+        </div>
+    </nav>
+
     <div class="container">
         <div class="header">
             <h1>Create Voice AI Assistant</h1>
@@ -377,6 +394,9 @@
             // Check authentication first
             const user = await requireAuth();
             if (!user) return; // Will redirect to auth page
+            
+            // Update user email in nav
+            document.getElementById('userEmail').textContent = user.email;
             
             await loadConfig();
             setupEventListeners();
