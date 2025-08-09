@@ -548,6 +548,11 @@
             document.getElementById('result').style.display = 'none';
             
             try {
+                // Check if authenticatedFetch is available
+                if (typeof authenticatedFetch === 'undefined') {
+                    throw new Error('Authentication helper not loaded. Please refresh the page.');
+                }
+                
                 const response = await authenticatedFetch('/api/assistants', {
                     method: 'POST',
                     headers: {
