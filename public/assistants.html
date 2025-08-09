@@ -3,210 +3,83 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Assistants - Voice AI Demo</title>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <title>Assistants - Voice Matrix AI</title>
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Design System -->
+    <link rel="stylesheet" href="/css/design-system.css">
+    
+    <!-- Theme Management -->
+    <script src="/js/theme.js"></script>
+    
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: #f9fafb;
-            color: #111827;
-            line-height: 1.6;
-        }
-        
-        /* Navigation */
-        .nav-container {
-            background: white;
-            border-bottom: 1px solid #e5e7eb;
-            position: sticky;
-            top: 0;
-            z-index: 100;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-        }
-        
-        .nav-content {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            height: 64px;
-        }
-        
-        .nav-brand {
-            font-size: 20px;
-            font-weight: 600;
-            color: #111827;
-            text-decoration: none;
-        }
-        
-        .nav-tabs {
-            display: flex;
-            gap: 8px;
-        }
-        
-        .nav-tab {
-            padding: 8px 16px;
-            color: #6b7280;
-            text-decoration: none;
-            border-radius: 6px;
-            font-weight: 500;
-            transition: all 0.2s;
-            position: relative;
-        }
-        
-        .nav-tab:hover {
-            background: #f3f4f6;
-            color: #111827;
-        }
-        
-        .nav-tab.active {
-            color: #2563eb;
-        }
-        
-        .nav-tab.active::after {
-            content: '';
-            position: absolute;
-            bottom: -17px;
-            left: 0;
-            right: 0;
-            height: 2px;
-            background: #2563eb;
-        }
-        
-        .user-menu {
-            display: flex;
-            align-items: center;
-            gap: 16px;
-        }
-        
-        .user-email {
-            color: #6b7280;
-            font-size: 14px;
-        }
-        
-        .sign-out-btn {
-            background: #ef4444;
-            color: white;
-            border: none;
-            padding: 8px 16px;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 14px;
-            font-weight: 500;
-            transition: all 0.2s;
-        }
-        
-        .sign-out-btn:hover {
-            background: #dc2626;
-        }
-        
-        /* Main Content */
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 32px 20px;
-        }
-        
         .page-header {
-            margin-bottom: 32px;
+            padding: var(--space-8) 0;
+            background: var(--bg-primary);
+            border-bottom: 1px solid var(--border-default);
         }
         
         .page-title {
-            font-size: 32px;
-            font-weight: 700;
-            color: #111827;
-            margin-bottom: 8px;
+            margin-bottom: var(--space-2);
         }
         
         .page-subtitle {
-            color: #6b7280;
-            font-size: 16px;
+            color: var(--text-secondary);
         }
         
-        .actions {
+        .page-actions {
             display: flex;
-            gap: 10px;
-            margin-bottom: 24px;
+            gap: var(--space-3);
+            margin-bottom: var(--space-8);
             justify-content: space-between;
             align-items: center;
         }
         
-        .btn {
-            padding: 10px 20px;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 14px;
-            font-weight: 500;
-            transition: all 0.2s ease;
-            text-decoration: none;
-            display: inline-block;
-        }
-        
-        .btn-primary {
-            background: #3b82f6;
-            color: white;
-        }
-        
-        .btn-primary:hover {
-            background: #2563eb;
-        }
-        
-        .btn-secondary {
-            background: #f3f4f6;
-            color: #374151;
-        }
-        
-        .btn-secondary:hover {
-            background: #e5e7eb;
-        }
-        
-        .btn-danger {
-            background: #ef4444;
-            color: white;
-        }
-        
-        .btn-danger:hover {
-            background: #dc2626;
-        }
-        
-        .btn-small {
-            padding: 6px 12px;
-            font-size: 13px;
-        }
-        
-        /* Assistant Cards */
         .assistants-grid {
             display: grid;
-            gap: 20px;
-            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+            gap: var(--space-6);
         }
         
         .assistant-card {
-            background: white;
-            border: 1px solid #e5e7eb;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-            border-radius: 12px;
-            padding: 24px;
-            transition: all 0.2s ease;
+            background: var(--bg-primary);
+            border: 1px solid var(--border-default);
+            border-radius: var(--radius-lg);
+            padding: var(--space-6);
+            transition: all var(--transition-normal);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .assistant-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: var(--color-primary);
+            border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
         }
         
         .assistant-card:hover {
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            box-shadow: var(--shadow-md);
+            transform: translateY(-2px);
+        }
+        
+        .assistant-card.inactive::before {
+            background: var(--text-muted);
         }
         
         .assistant-header {
             display: flex;
             justify-content: space-between;
             align-items: flex-start;
-            margin-bottom: 20px;
+            margin-bottom: var(--space-5);
         }
         
         .assistant-info {
@@ -215,43 +88,27 @@
         
         .assistant-name {
             font-size: 20px;
-            font-weight: 600;
-            margin-bottom: 4px;
-            color: #111827;
+            font-weight: var(--font-weight-semibold);
+            color: var(--text-primary);
+            margin-bottom: var(--space-1);
         }
         
         .assistant-company {
-            color: #6b7280;
+            color: var(--text-secondary);
             font-size: 14px;
-        }
-        
-        .status-badge {
-            display: inline-block;
-            padding: 4px 10px;
-            border-radius: 12px;
-            font-size: 12px;
-            font-weight: 500;
-        }
-        
-        .status-active {
-            background: #d1fae5;
-            color: #065f46;
-        }
-        
-        .status-inactive {
-            background: #fee2e2;
-            color: #991b1b;
+            font-weight: var(--font-weight-medium);
         }
         
         .assistant-details {
-            margin-bottom: 16px;
+            margin-bottom: var(--space-5);
         }
         
         .detail-item {
             display: flex;
             justify-content: space-between;
-            padding: 12px 0;
-            border-bottom: 1px solid #f3f4f6;
+            align-items: center;
+            padding: var(--space-3) 0;
+            border-bottom: 1px solid var(--border-default);
         }
         
         .detail-item:last-child {
@@ -259,265 +116,162 @@
         }
         
         .detail-label {
-            color: #6b7280;
+            color: var(--text-secondary);
             font-size: 14px;
+            font-weight: var(--font-weight-medium);
         }
         
         .detail-value {
-            color: #111827;
-            font-weight: 500;
+            color: var(--text-primary);
+            font-weight: var(--font-weight-medium);
             font-size: 14px;
+        }
+        
+        .vapi-id {
+            font-family: 'Monaco', 'Menlo', 'Consolas', monospace;
+            font-size: 12px;
+            background: var(--bg-secondary);
+            padding: var(--space-1) var(--space-2);
+            border-radius: var(--radius-sm);
         }
         
         .assistant-actions {
             display: flex;
-            gap: 8px;
-            margin-top: 16px;
-            padding-top: 16px;
-            border-top: 1px solid #e5e7eb;
+            gap: var(--space-3);
+            padding-top: var(--space-5);
+            border-top: 1px solid var(--border-default);
         }
         
-        /* Empty State */
-        .empty-state {
-            text-align: center;
-            padding: 60px 20px;
-            color: #6b7280;
-        }
-        
-        .empty-state svg {
-            width: 64px;
-            height: 64px;
-            margin: 0 auto 16px;
-            opacity: 0.3;
-        }
-        
-        .empty-state h3 {
-            font-size: 18px;
-            font-weight: 600;
-            color: #374151;
-            margin-bottom: 8px;
-        }
-        
-        .empty-state p {
-            color: #6b7280;
-        }
-        
-        /* Loading State */
         .loading {
             display: flex;
             justify-content: center;
             align-items: center;
-            padding: 40px;
-            color: #6b7280;
+            padding: var(--space-12);
+            gap: var(--space-3);
+            color: var(--text-secondary);
         }
         
-        .loading-spinner {
-            border: 3px solid #f3f4f6;
-            border-top: 3px solid #3b82f6;
-            border-radius: 50%;
-            width: 32px;
-            height: 32px;
-            animation: spin 1s linear infinite;
-            margin-right: 12px;
+        .empty-state {
+            text-align: center;
+            padding: var(--space-12) var(--space-4);
+            color: var(--text-secondary);
         }
         
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+        .empty-state-icon {
+            width: 64px;
+            height: 64px;
+            margin: 0 auto var(--space-4);
+            opacity: 0.5;
+            color: var(--text-muted);
         }
         
-        /* Modal */
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.5);
-            z-index: 1000;
-        }
-        
-        .modal.show {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-        }
-        
-        .modal-content {
-            background: white;
-            border-radius: 12px;
-            padding: 24px;
-            max-width: 500px;
-            width: 100%;
-            max-height: 90vh;
-            overflow-y: auto;
-            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-        }
-        
-        .modal-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-        }
-        
-        .modal-title {
+        .empty-state h3 {
             font-size: 20px;
-            font-weight: 600;
-            color: #111827;
+            font-weight: var(--font-weight-semibold);
+            color: var(--text-primary);
+            margin-bottom: var(--space-2);
         }
         
-        .close-btn {
-            background: none;
-            border: none;
-            color: #6b7280;
-            font-size: 24px;
-            cursor: pointer;
-            padding: 4px;
+        .empty-state p {
+            color: var(--text-secondary);
+            margin-bottom: var(--space-6);
         }
         
-        .close-btn:hover {
-            color: #374151;
-        }
-        
-        .form-group {
-            margin-bottom: 16px;
-        }
-        
-        .form-group label {
-            display: block;
-            margin-bottom: 4px;
-            color: #374151;
-            font-size: 14px;
-            font-weight: 500;
-        }
-        
-        .form-group input,
-        .form-group select,
-        .form-group textarea {
-            width: 100%;
-            padding: 8px 12px;
-            border: 1px solid #d1d5db;
-            border-radius: 6px;
-            background: white;
-            color: #111827;
-            font-size: 14px;
-        }
-        
-        .form-group input:focus,
-        .form-group select:focus,
-        .form-group textarea:focus {
-            outline: none;
-            border-color: #3b82f6;
-            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
-        }
-        
-        .form-group textarea {
-            min-height: 100px;
-            resize: vertical;
-        }
-        
-        .modal-actions {
-            display: flex;
-            gap: 8px;
-            justify-content: flex-end;
-            margin-top: 24px;
-        }
-        
-        /* Responsive */
         @media (max-width: 768px) {
-            .nav-content {
-                flex-direction: column;
-                height: auto;
-                padding: 16px 20px;
-                gap: 16px;
-            }
-            
-            .nav-tabs {
-                order: 2;
-                width: 100%;
-                justify-content: center;
-            }
-            
-            .user-menu {
-                order: 1;
-                width: 100%;
-                justify-content: space-between;
-            }
-            
-            .nav-brand {
-                display: none;
-            }
-            
-            .page-title {
-                font-size: 24px;
-            }
-            
             .assistants-grid {
                 grid-template-columns: 1fr;
+                gap: var(--space-4);
             }
             
-            .actions {
+            .page-actions {
                 flex-direction: column;
                 align-items: stretch;
+                gap: var(--space-4);
             }
             
             .assistant-actions {
                 flex-direction: column;
             }
+            
+            .page-header {
+                padding: var(--space-6) 0;
+            }
         }
     </style>
+    
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
     <!-- Navigation -->
-    <nav class="nav-container">
+    <nav class="nav">
         <div class="nav-content">
-            <a href="/dashboard" class="nav-brand">Voice AI Demo</a>
+            <a href="/dashboard" class="nav-brand">Voice Matrix AI</a>
             <div class="nav-tabs">
                 <a href="/dashboard" class="nav-tab">Dashboard</a>
                 <a href="/assistants" class="nav-tab active">Assistants</a>
                 <a href="/phone-numbers" class="nav-tab">Phone Numbers</a>
                 <a href="/analytics" class="nav-tab">Analytics</a>
             </div>
-            <div class="user-menu">
-                <span class="user-email" id="userEmail">Loading...</span>
-                <button class="sign-out-btn" onclick="signOut()">Sign Out</button>
+            <div class="nav-user">
+                <span class="nav-user-email" id="userEmail">Loading...</span>
+                <button class="btn btn-danger btn-sm" onclick="signOut()">Sign Out</button>
             </div>
         </div>
     </nav>
 
-    <div class="container">
-        <div class="page-header">
-            <h1 class="page-title">AI Assistants</h1>
-            <p class="page-subtitle">Create and manage your voice AI assistants</p>
+    <!-- Page Header -->
+    <section class="page-header">
+        <div class="container">
+            <h1 class="text-h1 page-title">AI Assistants</h1>
+            <p class="text-lg page-subtitle">Create and manage your voice AI assistants</p>
         </div>
+    </section>
 
-        <div class="actions">
-            <button class="btn btn-primary" onclick="window.location.href='/create-assistant'">Create New Assistant</button>
-            <button class="btn btn-secondary" onclick="loadAssistants()">Refresh</button>
-        </div>
+    <!-- Main Content -->
+    <main class="section">
+        <div class="container">
+            <!-- Page Actions -->
+            <div class="page-actions">
+                <a href="/create-assistant" class="btn btn-primary">
+                    <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                    </svg>
+                    Create New Assistant
+                </a>
+                <button class="btn btn-secondary" onclick="loadAssistants()">
+                    <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                    </svg>
+                    Refresh
+                </button>
+            </div>
 
-        <div class="loading" id="loading">
-            <div class="loading-spinner"></div>
-            <div>Loading assistants...</div>
-        </div>
+            <!-- Loading State -->
+            <div class="loading" id="loading">
+                <div class="loading-spinner"></div>
+                <span>Loading assistants...</span>
+            </div>
 
-        <div id="assistantsList" style="display: none;">
-            <div class="assistants-grid" id="assistantsGrid">
-                <!-- Assistant cards will be loaded here -->
+            <!-- Assistants List -->
+            <div id="assistantsList" style="display: none;">
+                <div class="assistants-grid" id="assistantsGrid">
+                    <!-- Assistant cards will be loaded here -->
+                </div>
+            </div>
+
+            <!-- Empty State -->
+            <div class="empty-state" id="emptyState" style="display: none;">
+                <svg class="empty-state-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
+                </svg>
+                <h3>No Assistants Yet</h3>
+                <p>Create your first AI assistant to get started</p>
+                <a href="/create-assistant" class="btn btn-primary">
+                    Create Your First Assistant
+                </a>
             </div>
         </div>
-
-        <div class="empty-state" id="emptyState" style="display: none;">
-            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
-            </svg>
-            <h3>No Assistants Yet</h3>
-            <p>Create your first AI assistant to get started</p>
-        </div>
-    </div>
+    </main>
 
     <script>
         // Global variables
@@ -560,7 +314,7 @@
 
             const { data: { user } } = await supabase.auth.getUser();
             if (!user) {
-                window.location.href = '/auth.html';
+                window.location.href = '/auth';
                 return null;
             }
             return user;
@@ -570,14 +324,14 @@
         async function signOut() {
             if (!supabase) return;
             await supabase.auth.signOut();
-            window.location.href = '/auth.html';
+            window.location.href = '/auth';
         }
 
         // Authenticated fetch helper
         async function authenticatedFetch(url, options = {}) {
             const { data: { session } } = await supabase.auth.getSession();
             if (!session) {
-                window.location.href = '/auth.html';
+                window.location.href = '/auth';
                 return null;
             }
 
@@ -634,13 +388,13 @@
             const grid = document.getElementById('assistantsGrid');
             
             grid.innerHTML = assistants.map(assistant => `
-                <div class="assistant-card">
+                <div class="assistant-card ${assistant.is_active ? '' : 'inactive'}">
                     <div class="assistant-header">
                         <div class="assistant-info">
-                            <h3 class="assistant-name">${assistant.name}</h3>
-                            <p class="assistant-company">${assistant.company_name}</p>
+                            <h3 class="assistant-name">${escapeHtml(assistant.name)}</h3>
+                            <p class="assistant-company">${escapeHtml(assistant.company_name || 'No company')}</p>
                         </div>
-                        <span class="status-badge status-${assistant.is_active ? 'active' : 'inactive'}">
+                        <span class="badge ${assistant.is_active ? 'badge-success' : 'badge-neutral'}">
                             ${assistant.is_active ? 'Active' : 'Inactive'}
                         </span>
                     </div>
@@ -648,7 +402,7 @@
                     <div class="assistant-details">
                         <div class="detail-item">
                             <span class="detail-label">Voice</span>
-                            <span class="detail-value">${assistant.voice}</span>
+                            <span class="detail-value">${escapeHtml(assistant.voice || 'Default')}</span>
                         </div>
                         <div class="detail-item">
                             <span class="detail-label">Created</span>
@@ -657,7 +411,7 @@
                         ${assistant.vapi_assistant_id ? `
                             <div class="detail-item">
                                 <span class="detail-label">VAPI ID</span>
-                                <span class="detail-value" style="font-family: monospace; font-size: 12px;">
+                                <span class="detail-value vapi-id">
                                     ${assistant.vapi_assistant_id.substring(0, 8)}...
                                 </span>
                             </div>
@@ -665,15 +419,33 @@
                     </div>
                     
                     <div class="assistant-actions">
-                        <button class="btn btn-secondary btn-small" onclick="editAssistant('${assistant.id}')">
+                        <button class="btn btn-secondary btn-sm" onclick="editAssistant('${assistant.id}')">
+                            <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                            </svg>
                             Edit
                         </button>
-                        <button class="btn btn-danger btn-small" onclick="deleteAssistant('${assistant.id}', '${assistant.name}')">
+                        <button class="btn btn-danger btn-sm" onclick="deleteAssistant('${assistant.id}', '${escapeHtml(assistant.name)}')">
+                            <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                            </svg>
                             Delete
                         </button>
                     </div>
                 </div>
             `).join('');
+        }
+
+        // Helper function to escape HTML
+        function escapeHtml(text) {
+            const map = {
+                '&': '&amp;',
+                '<': '&lt;',
+                '>': '&gt;',
+                '"': '&quot;',
+                "'": '&#039;'
+            };
+            return text ? text.toString().replace(/[&<>"']/g, m => map[m]) : '';
         }
 
         // Edit assistant
@@ -712,8 +484,34 @@
             }
         }
 
-        // Initialize on load
-        window.addEventListener('load', init);
+        // Add loading animations
+        document.addEventListener('DOMContentLoaded', () => {
+            // Initialize the app
+            init();
+        });
+
+        // Add staggered animation for assistant cards
+        function animateAssistantCards() {
+            const assistantCards = document.querySelectorAll('.assistant-card');
+            assistantCards.forEach((card, index) => {
+                card.style.opacity = '0';
+                card.style.transform = 'translateY(20px)';
+                card.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+                
+                setTimeout(() => {
+                    card.style.opacity = '1';
+                    card.style.transform = 'translateY(0)';
+                }, index * 100);
+            });
+        }
+
+        // Override renderAssistants to include animation
+        const originalRenderAssistants = renderAssistants;
+        renderAssistants = function() {
+            originalRenderAssistants();
+            // Animate cards after rendering
+            setTimeout(animateAssistantCards, 50);
+        };
     </script>
 </body>
 </html>

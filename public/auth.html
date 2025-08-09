@@ -13,6 +13,9 @@
     <!-- Design System -->
     <link rel="stylesheet" href="/css/design-system.css">
     
+    <!-- Theme Management -->
+    <script src="/js/theme.js"></script>
+    
     <style>
         .auth-container {
             min-height: 100vh;
@@ -166,6 +169,13 @@
             text-decoration: underline;
         }
         
+        .auth-theme-toggle {
+            position: absolute;
+            top: var(--space-4);
+            right: var(--space-4);
+            z-index: 10;
+        }
+        
         @media (max-width: 480px) {
             .auth-card {
                 padding: var(--space-6);
@@ -175,6 +185,11 @@
             .auth-title {
                 font-size: 24px;
             }
+            
+            .auth-theme-toggle {
+                top: var(--space-3);
+                right: var(--space-3);
+            }
         }
     </style>
     
@@ -182,6 +197,11 @@
 </head>
 <body>
     <div class="auth-container">
+        <!-- Theme Toggle -->
+        <div class="auth-theme-toggle" id="authThemeToggle">
+            <!-- Theme toggle will be inserted here by theme.js -->
+        </div>
+        
         <div class="auth-card">
             <div class="auth-header">
                 <div class="auth-logo">
@@ -417,6 +437,15 @@
             await initSupabase();
             await checkExistingAuth();
             setupAuthListener();
+
+            // Add theme toggle to auth page
+            if (window.themeManager) {
+                const authThemeToggle = document.getElementById('authThemeToggle');
+                if (authThemeToggle) {
+                    const toggleButton = window.themeManager.createToggleButton();
+                    authThemeToggle.appendChild(toggleButton);
+                }
+            }
 
             // Set up event listeners
             document.getElementById('googleSignIn').addEventListener('click', handleGoogleSignIn);

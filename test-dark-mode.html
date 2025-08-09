@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dark Mode Test - Voice Matrix AI</title>
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Design System -->
+    <link rel="stylesheet" href="/public/css/design-system.css">
+    
+    <!-- Theme Management -->
+    <script src="/public/js/theme.js"></script>
+    
+    <style>
+        body {
+            padding: var(--space-8);
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        .test-section {
+            margin-bottom: var(--space-8);
+            padding: var(--space-6);
+            border: 1px solid var(--border-default);
+            border-radius: var(--radius-lg);
+            background: var(--bg-primary);
+        }
+        
+        .color-swatch {
+            display: inline-block;
+            width: 40px;
+            height: 40px;
+            border-radius: var(--radius-md);
+            margin: var(--space-1);
+            border: 1px solid var(--border-default);
+        }
+        
+        .theme-info {
+            background: var(--bg-secondary);
+            padding: var(--space-4);
+            border-radius: var(--radius-md);
+            margin: var(--space-4) 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-section">
+        <h1 class="text-h1 mb-4">Dark Mode Implementation Test</h1>
+        
+        <div class="theme-toggle-container mb-6">
+            <button id="themeToggleTest" class="theme-toggle" onclick="toggleTheme()">
+                <svg class="sun-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path>
+                </svg>
+                <svg class="moon-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path>
+                </svg>
+            </button>
+            <span class="text-secondary ml-4">Click to toggle between light and dark themes</span>
+        </div>
+    </div>
+
+    <div class="test-section">
+        <h2 class="text-h2 mb-4">Typography Test</h2>
+        <h1 class="text-h1">H1 Heading - Primary Text</h1>
+        <h2 class="text-h2">H2 Heading - Primary Text</h2>
+        <h3 class="text-h3">H3 Heading - Primary Text</h3>
+        <p class="text-base text-primary">Primary text color</p>
+        <p class="text-base text-secondary">Secondary text color</p>
+        <p class="text-base text-muted">Muted text color</p>
+    </div>
+
+    <div class="test-section">
+        <h2 class="text-h2 mb-4">Button Test</h2>
+        <div class="flex gap-3 flex-wrap">
+            <button class="btn btn-primary">Primary Button</button>
+            <button class="btn btn-secondary">Secondary Button</button>
+            <button class="btn btn-danger">Danger Button</button>
+            <button class="btn btn-text">Text Button</button>
+        </div>
+    </div>
+
+    <div class="test-section">
+        <h2 class="text-h2 mb-4">Card Test</h2>
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">Card Title</h3>
+                <p class="card-subtitle">Card subtitle with secondary text</p>
+            </div>
+            <div class="card-content">
+                <p>This is card content that should adapt to the current theme.</p>
+            </div>
+            <div class="card-actions">
+                <button class="btn btn-primary btn-sm">Action</button>
+                <button class="btn btn-secondary btn-sm">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="test-section">
+        <h2 class="text-h2 mb-4">Form Elements Test</h2>
+        <div class="input-group">
+            <label class="input-label">Email Address</label>
+            <input type="email" class="input" placeholder="Enter your email">
+        </div>
+        <div class="input-group">
+            <label class="input-label">Message</label>
+            <textarea class="input textarea" placeholder="Enter your message"></textarea>
+        </div>
+        <div class="input-group">
+            <label class="input-label">Select Option</label>
+            <select class="input select">
+                <option>Option 1</option>
+                <option>Option 2</option>
+                <option>Option 3</option>
+            </select>
+        </div>
+    </div>
+
+    <div class="test-section">
+        <h2 class="text-h2 mb-4">Badge Test</h2>
+        <div class="flex gap-3 flex-wrap">
+            <span class="badge badge-success">Success</span>
+            <span class="badge badge-warning">Warning</span>
+            <span class="badge badge-error">Error</span>
+            <span class="badge badge-info">Info</span>
+            <span class="badge badge-neutral">Neutral</span>
+        </div>
+    </div>
+
+    <div class="test-section">
+        <h2 class="text-h2 mb-4">Color Swatches</h2>
+        <p class="text-secondary mb-4">Current theme colors:</p>
+        <div>
+            <div class="color-swatch" style="background: var(--color-primary);" title="Primary"></div>
+            <div class="color-swatch" style="background: var(--bg-primary);" title="Background Primary"></div>
+            <div class="color-swatch" style="background: var(--bg-secondary);" title="Background Secondary"></div>
+            <div class="color-swatch" style="background: var(--text-primary);" title="Text Primary"></div>
+            <div class="color-swatch" style="background: var(--text-secondary);" title="Text Secondary"></div>
+            <div class="color-swatch" style="background: var(--border-default);" title="Border"></div>
+        </div>
+    </div>
+
+    <div class="theme-info">
+        <p><strong>Current Theme:</strong> <span id="currentTheme">Loading...</span></p>
+        <p><strong>Theme Persistence:</strong> <span id="themePersistence">Loading...</span></p>
+        <p><strong>System Preference:</strong> <span id="systemPreference">Loading...</span></p>
+    </div>
+
+    <script>
+        function toggleTheme() {
+            if (window.themeManager) {
+                window.themeManager.toggleTheme();
+                updateThemeInfo();
+            }
+        }
+
+        function updateThemeInfo() {
+            if (window.themeManager) {
+                document.getElementById('currentTheme').textContent = window.themeManager.getCurrentTheme();
+                document.getElementById('themePersistence').textContent = 
+                    window.themeManager.hasStoredTheme() ? 'Enabled' : 'Using system preference';
+                
+                const systemPrefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+                document.getElementById('systemPreference').textContent = systemPrefersDark ? 'Dark' : 'Light';
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            updateThemeInfo();
+            
+            // Listen for theme changes
+            if (window.matchMedia) {
+                window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', updateThemeInfo);
+            }
+        });
+    </script>
+</body>
+</html>
