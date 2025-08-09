@@ -1,0 +1,10 @@
+{
+  "name": "Test Assistant API",
+  "company_name": "Test Company",
+  "first_message": "Hello! This is a test from our API.",
+  "voice_id": "Elliot",
+  "personality_traits": ["professional", "friendly"],
+  "max_call_duration": 180,
+  "background_sound": "office",
+  "evaluation_method": "NumericScale"
+}

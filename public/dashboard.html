@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Voice AI Demo</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f9fafb;
+            color: #111827;
+            line-height: 1.6;
+        }
+        
+        /* Navigation */
+        .nav-container {
+            background: white;
+            border-bottom: 1px solid #e5e7eb;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+        
+        .nav-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            height: 64px;
+        }
+        
+        .nav-brand {
+            font-size: 20px;
+            font-weight: 600;
+            color: #111827;
+            text-decoration: none;
+        }
+        
+        .nav-tabs {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .nav-tab {
+            padding: 8px 16px;
+            color: #6b7280;
+            text-decoration: none;
+            border-radius: 6px;
+            font-weight: 500;
+            transition: all 0.2s;
+            position: relative;
+        }
+        
+        .nav-tab:hover {
+            background: #f3f4f6;
+            color: #111827;
+        }
+        
+        .nav-tab.active {
+            color: #2563eb;
+        }
+        
+        .nav-tab.active::after {
+            content: '';
+            position: absolute;
+            bottom: -17px;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: #2563eb;
+        }
+        
+        .user-menu {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+        
+        .user-email {
+            color: #6b7280;
+            font-size: 14px;
+        }
+        
+        .sign-out-btn {
+            background: #ef4444;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+        
+        .sign-out-btn:hover {
+            background: #dc2626;
+        }
+        
+        /* Main Content */
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 32px 20px;
+        }
+        
+        .page-header {
+            text-align: center;
+            margin-bottom: 48px;
+        }
+        
+        .page-title {
+            font-size: 36px;
+            font-weight: 700;
+            color: #111827;
+            margin-bottom: 8px;
+        }
+        
+        .page-subtitle {
+            color: #6b7280;
+            font-size: 18px;
+        }
+        
+        /* Quick Actions */
+        .quick-actions {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 24px;
+            margin-bottom: 48px;
+        }
+        
+        .action-card {
+            background: white;
+            border-radius: 12px;
+            padding: 32px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            border: 1px solid #e5e7eb;
+            text-align: center;
+            transition: all 0.2s ease;
+            cursor: pointer;
+            text-decoration: none;
+            color: inherit;
+        }
+        
+        .action-card:hover {
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            transform: translateY(-2px);
+        }
+        
+        .action-icon {
+            width: 64px;
+            height: 64px;
+            margin: 0 auto 16px;
+            padding: 16px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .action-icon.blue {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+        
+        .action-icon.green {
+            background: #d1fae5;
+            color: #065f46;
+        }
+        
+        .action-icon.purple {
+            background: #e0e7ff;
+            color: #3730a3;
+        }
+        
+        .action-icon.orange {
+            background: #fed7aa;
+            color: #9a3412;
+        }
+        
+        .action-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: #111827;
+            margin-bottom: 8px;
+        }
+        
+        .action-description {
+            color: #6b7280;
+            font-size: 14px;
+        }
+        
+        /* Recent Activity */
+        .recent-activity {
+            background: white;
+            border-radius: 12px;
+            padding: 32px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            border: 1px solid #e5e7eb;
+        }
+        
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+        
+        .section-title {
+            font-size: 24px;
+            font-weight: 600;
+            color: #111827;
+        }
+        
+        .view-all-btn {
+            color: #2563eb;
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 14px;
+        }
+        
+        .view-all-btn:hover {
+            text-decoration: underline;
+        }
+        
+        .activity-item {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 16px 0;
+            border-bottom: 1px solid #f3f4f6;
+        }
+        
+        .activity-item:last-child {
+            border-bottom: none;
+        }
+        
+        .activity-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+        
+        .activity-icon.call {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+        
+        .activity-icon.assistant {
+            background: #d1fae5;
+            color: #065f46;
+        }
+        
+        .activity-icon.phone {
+            background: #fed7aa;
+            color: #9a3412;
+        }
+        
+        .activity-content {
+            flex: 1;
+        }
+        
+        .activity-title {
+            font-weight: 500;
+            color: #111827;
+            margin-bottom: 2px;
+        }
+        
+        .activity-time {
+            color: #6b7280;
+            font-size: 12px;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 48px 20px;
+            color: #6b7280;
+        }
+        
+        .empty-state svg {
+            width: 48px;
+            height: 48px;
+            margin: 0 auto 16px;
+            opacity: 0.3;
+        }
+        
+        /* Loading State */
+        .loading {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 200px;
+            color: #6b7280;
+        }
+        
+        .loading-spinner {
+            border: 3px solid #f3f4f6;
+            border-top: 3px solid #3b82f6;
+            border-radius: 50%;
+            width: 32px;
+            height: 32px;
+            animation: spin 1s linear infinite;
+            margin-right: 12px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .nav-content {
+                flex-direction: column;
+                height: auto;
+                padding: 16px 20px;
+                gap: 16px;
+            }
+            
+            .nav-tabs {
+                order: 2;
+                width: 100%;
+                justify-content: center;
+                flex-wrap: wrap;
+            }
+            
+            .user-menu {
+                order: 1;
+                width: 100%;
+                justify-content: space-between;
+            }
+            
+            .nav-brand {
+                display: none;
+            }
+            
+            .page-title {
+                font-size: 28px;
+            }
+            
+            .quick-actions {
+                grid-template-columns: 1fr;
+            }
+            
+            .action-card {
+                padding: 24px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="nav-container">
+        <div class="nav-content">
+            <a href="/dashboard.html" class="nav-brand">Voice AI Demo</a>
+            <div class="nav-tabs">
+                <a href="/dashboard.html" class="nav-tab active">Dashboard</a>
+                <a href="/assistants.html" class="nav-tab">Assistants</a>
+                <a href="/phone-numbers.html" class="nav-tab">Phone Numbers</a>
+                <a href="/analytics.html" class="nav-tab">Analytics</a>
+            </div>
+            <div class="user-menu">
+                <span class="user-email" id="userEmail">Loading...</span>
+                <button class="sign-out-btn" onclick="signOut()">Sign Out</button>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="page-header">
+            <h1 class="page-title">Welcome to Voice AI</h1>
+            <p class="page-subtitle">Manage your AI assistants, phone numbers, and view analytics</p>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="quick-actions">
+            <a href="/index.html" class="action-card">
+                <div class="action-icon blue">
+                    <svg width="32" height="32" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                    </svg>
+                </div>
+                <div class="action-title">Create Assistant</div>
+                <div class="action-description">Set up a new AI voice assistant with custom prompts and settings</div>
+            </a>
+
+            <a href="/assistants.html" class="action-card">
+                <div class="action-icon green">
+                    <svg width="32" height="32" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
+                    </svg>
+                </div>
+                <div class="action-title">Manage Assistants</div>
+                <div class="action-description">View, edit, and delete your existing AI assistants</div>
+            </a>
+
+            <a href="/phone-numbers.html" class="action-card">
+                <div class="action-icon orange">
+                    <svg width="32" height="32" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path>
+                    </svg>
+                </div>
+                <div class="action-title">Phone Numbers</div>
+                <div class="action-description">Add and configure Twilio phone numbers for your assistants</div>
+            </a>
+
+            <a href="/analytics.html" class="action-card">
+                <div class="action-icon purple">
+                    <svg width="32" height="32" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                    </svg>
+                </div>
+                <div class="action-title">View Analytics</div>
+                <div class="action-description">Monitor call metrics, usage, and performance analytics</div>
+            </a>
+        </div>
+
+        <!-- Recent Activity -->
+        <div class="recent-activity">
+            <div class="section-header">
+                <h2 class="section-title">Recent Activity</h2>
+                <a href="/analytics.html" class="view-all-btn">View All</a>
+            </div>
+            
+            <div id="activityContent">
+                <div class="loading">
+                    <div class="loading-spinner"></div>
+                    <div>Loading recent activity...</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Global variables
+        let supabase;
+        let currentUser;
+
+        // Initialize
+        async function init() {
+            await initSupabase();
+            currentUser = await requireAuth();
+            if (!currentUser) return;
+
+            // Update UI with user info
+            document.getElementById('userEmail').textContent = currentUser.email;
+
+            // Load recent activity
+            await loadRecentActivity();
+        }
+
+        // Initialize Supabase
+        async function initSupabase() {
+            try {
+                const response = await fetch('/api/config/auth');
+                const config = await response.json();
+                
+                if (response.ok) {
+                    supabase = window.supabase.createClient(config.supabaseUrl, config.supabaseAnonKey);
+                } else {
+                    throw new Error(config.message || 'Failed to load auth config');
+                }
+            } catch (error) {
+                alert('Failed to initialize authentication: ' + error.message);
+            }
+        }
+
+        // Require authentication
+        async function requireAuth() {
+            if (!supabase) return null;
+
+            const { data: { user } } = await supabase.auth.getUser();
+            if (!user) {
+                window.location.href = '/auth.html';
+                return null;
+            }
+            return user;
+        }
+
+        // Sign out
+        async function signOut() {
+            if (!supabase) return;
+            await supabase.auth.signOut();
+            window.location.href = '/auth.html';
+        }
+
+        // Authenticated fetch helper
+        async function authenticatedFetch(url, options = {}) {
+            const { data: { session } } = await supabase.auth.getSession();
+            if (!session) {
+                window.location.href = '/auth.html';
+                return null;
+            }
+
+            const response = await fetch(url, {
+                ...options,
+                headers: {
+                    ...options.headers,
+                    'Authorization': `Bearer ${session.access_token}`,
+                    'Content-Type': 'application/json'
+                }
+            });
+
+            return response;
+        }
+
+        // Load recent activity
+        async function loadRecentActivity() {
+            const activityContent = document.getElementById('activityContent');
+            
+            try {
+                const response = await authenticatedFetch('/api/analytics/dashboard');
+                if (!response || !response.ok) {
+                    throw new Error('Failed to load recent activity');
+                }
+
+                const result = await response.json();
+                if (!result.success) {
+                    throw new Error(result.error || 'Failed to load recent activity');
+                }
+
+                const data = result.data;
+                renderRecentActivity(data.callHistory.slice(0, 5)); // Show last 5 activities
+
+            } catch (error) {
+                console.error('Error loading recent activity:', error);
+                activityContent.innerHTML = `
+                    <div class="empty-state">
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                        <p>Unable to load recent activity</p>
+                    </div>
+                `;
+            }
+        }
+
+        // Render recent activity
+        function renderRecentActivity(activities) {
+            const activityContent = document.getElementById('activityContent');
+            
+            if (activities.length === 0) {
+                activityContent.innerHTML = `
+                    <div class="empty-state">
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
+                        </svg>
+                        <p>No recent activity. Start by creating an assistant!</p>
+                    </div>
+                `;
+                return;
+            }
+
+            const activityHTML = activities.map(activity => `
+                <div class="activity-item">
+                    <div class="activity-icon call">
+                        <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path>
+                        </svg>
+                    </div>
+                    <div class="activity-content">
+                        <div class="activity-title">Call ${activity.status} - ${activity.duration}</div>
+                        <div class="activity-time">${formatTimeAgo(activity.startedAt)}</div>
+                    </div>
+                </div>
+            `).join('');
+
+            activityContent.innerHTML = activityHTML;
+        }
+
+        // Helper function to format time ago
+        function formatTimeAgo(dateStr) {
+            const date = new Date(dateStr);
+            const now = new Date();
+            const diff = now - date;
+            const minutes = Math.floor(diff / 60000);
+            const hours = Math.floor(diff / 3600000);
+            const days = Math.floor(diff / 86400000);
+
+            if (days > 0) return `${days} day${days > 1 ? 's' : ''} ago`;
+            if (hours > 0) return `${hours} hour${hours > 1 ? 's' : ''} ago`;
+            if (minutes > 0) return `${minutes} minute${minutes > 1 ? 's' : ''} ago`;
+            return 'Just now';
+        }
+
+        // Initialize on load
+        window.addEventListener('load', init);
+    </script>
+</body>
+</html>

@@ -1,0 +1,953 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Phone Numbers - Voice AI Demo</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #0f0f0f;
+            color: #ffffff;
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .nav-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+            border-bottom: 1px solid #333;
+        }
+        
+        .nav-tab {
+            padding: 10px 20px;
+            background: #1a1a1a;
+            border: 1px solid #333;
+            border-bottom: none;
+            border-radius: 8px 8px 0 0;
+            color: #ccc;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .nav-tab.active {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .form-section {
+            background: #1a1a1a;
+            border-radius: 12px;
+            padding: 30px;
+            margin-bottom: 30px;
+            border: 1px solid #333;
+        }
+        
+        .section-title {
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #ccc;
+        }
+        
+        .required {
+            color: #ff6b6b;
+        }
+        
+        input, select, textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #333;
+            border-radius: 8px;
+            background: #2a2a2a;
+            color: #fff;
+            font-size: 16px;
+            transition: border-color 0.3s ease;
+        }
+        
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        
+        textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+        
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+        }
+        
+        .btn-secondary {
+            background: #333;
+            color: #ccc;
+        }
+        
+        .btn-secondary:hover {
+            background: #444;
+        }
+        
+        .phone-numbers-grid {
+            display: grid;
+            gap: 20px;
+            margin-top: 20px;
+        }
+        
+        .phone-number-card {
+            background: #2a2a2a;
+            border: 1px solid #333;
+            border-radius: 12px;
+            padding: 20px;
+            transition: border-color 0.3s ease;
+        }
+        
+        .phone-number-card:hover {
+            border-color: #667eea;
+        }
+        
+        .phone-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 15px;
+        }
+        
+        .phone-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #fff;
+        }
+        
+        .phone-number {
+            font-size: 1.1rem;
+            color: #667eea;
+            font-family: monospace;
+        }
+        
+        .phone-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+        
+        .detail-item {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+        
+        .detail-label {
+            font-size: 0.9rem;
+            color: #888;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .detail-value {
+            color: #fff;
+            font-weight: 500;
+        }
+        
+        .status-badge {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            text-transform: uppercase;
+        }
+        
+        .status-active {
+            background: #27ae60;
+            color: white;
+        }
+        
+        .status-inactive {
+            background: #e74c3c;
+            color: white;
+        }
+        
+        .card-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+            padding-top: 15px;
+            border-top: 1px solid #333;
+        }
+        
+        .btn-small {
+            padding: 8px 16px;
+            font-size: 14px;
+        }
+        
+        .btn-danger {
+            background: #e74c3c;
+            color: white;
+        }
+        
+        .btn-danger:hover {
+            background: #c0392b;
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+        }
+        
+        .modal.show {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .modal-content {
+            background: #1a1a1a;
+            border-radius: 12px;
+            padding: 30px;
+            max-width: 600px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            border: 1px solid #333;
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .modal-title {
+            font-size: 1.5rem;
+            color: #fff;
+        }
+        
+        .close-btn {
+            background: none;
+            border: none;
+            color: #ccc;
+            font-size: 24px;
+            cursor: pointer;
+            padding: 5px;
+        }
+        
+        .close-btn:hover {
+            color: #fff;
+        }
+        
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+        
+        .result {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 8px;
+            display: none;
+        }
+        
+        .result.success {
+            background: rgba(39, 174, 96, 0.2);
+            color: #27ae60;
+            border: 1px solid #27ae60;
+        }
+        
+        .result.error {
+            background: rgba(231, 76, 60, 0.2);
+            color: #e74c3c;
+            border: 1px solid #e74c3c;
+        }
+        
+        .info-box {
+            background: rgba(102, 126, 234, 0.1);
+            border: 1px solid #667eea;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .info-box h4 {
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+        
+        .info-box p {
+            color: #ccc;
+            font-size: 0.9rem;
+        }
+        
+        @media (max-width: 768px) {
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+            
+            .phone-details {
+                grid-template-columns: 1fr;
+            }
+            
+            .nav-tabs {
+                flex-wrap: wrap;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="nav-container" style="background: white; border-bottom: 1px solid #333; position: sticky; top: 0; z-index: 100; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);">
+        <div style="max-width: 1200px; margin: 0 auto; padding: 0 20px; display: flex; justify-content: space-between; align-items: center; height: 64px;">
+            <a href="/dashboard.html" style="font-size: 20px; font-weight: 600; color: #ffffff; text-decoration: none;">Voice AI Demo</a>
+            <div style="display: flex; gap: 8px;">
+                <a href="/dashboard.html" style="padding: 8px 16px; color: #ccc; text-decoration: none; border-radius: 6px; font-weight: 500; transition: all 0.2s;">Dashboard</a>
+                <a href="/assistants.html" style="padding: 8px 16px; color: #ccc; text-decoration: none; border-radius: 6px; font-weight: 500; transition: all 0.2s;">Assistants</a>
+                <a href="/phone-numbers.html" style="padding: 8px 16px; color: #667eea; text-decoration: none; border-radius: 6px; font-weight: 500; transition: all 0.2s; position: relative;">Phone Numbers</a>
+                <a href="/analytics.html" style="padding: 8px 16px; color: #ccc; text-decoration: none; border-radius: 6px; font-weight: 500; transition: all 0.2s;">Analytics</a>
+            </div>
+            <div style="display: flex; align-items: center; gap: 16px;">
+                <span style="color: #ccc; font-size: 14px;" id="userEmailNav">Loading...</span>
+                <button style="background: #ef4444; color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: 500;" onclick="signOutNav()">Sign Out</button>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="header">
+            <h1>Phone Number Management</h1>
+            <p>Manage your Twilio phone numbers and VAPI integration</p>
+        </div>
+
+        <div class="nav-tabs">
+            <div class="nav-tab active" onclick="switchTab('manage')">Manage Numbers</div>
+            <div class="nav-tab" onclick="switchTab('add')">Add New Number</div>
+            <div class="nav-tab" onclick="switchTab('docs')">Integration Guide</div>
+        </div>
+
+        <!-- Manage Phone Numbers Tab -->
+        <div id="manage-tab" class="tab-content active">
+            <div class="form-section">
+                <div class="section-title">
+                    Your Phone Numbers
+                </div>
+                
+                <div class="phone-numbers-grid" id="phoneNumbersGrid">
+                    <!-- Phone numbers will be loaded here -->
+                </div>
+                
+                <div class="loading" id="loadingNumbers">
+                    <p>Loading phone numbers...</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Add Phone Number Tab -->
+        <div id="add-tab" class="tab-content">
+            <div class="form-section">
+                <div class="section-title">
+                    Add New Phone Number
+                </div>
+                
+                <div class="info-box">
+                    <h4>Requirements</h4>
+                    <p>You need a Twilio account with an active phone number. The phone number must be in E.164 format (e.g., +14155551234).</p>
+                </div>
+                
+                <form id="addPhoneForm">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="friendlyName">Friendly Name <span class="required">*</span></label>
+                            <input type="text" id="friendlyName" name="friendlyName" required 
+                                   placeholder="e.g., Main Sales Line" maxlength="255">
+                        </div>
+                        <div class="form-group">
+                            <label for="phoneNumber">Phone Number <span class="required">*</span></label>
+                            <input type="tel" id="phoneNumber" name="phoneNumber" required 
+                                   placeholder="+14155551234" pattern="^\+[1-9]\d{1,14}$">
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="twilioAccountSid">Twilio Account SID <span class="required">*</span></label>
+                            <input type="text" id="twilioAccountSid" name="twilioAccountSid" required 
+                                   placeholder="ACxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" maxlength="34">
+                        </div>
+                        <div class="form-group">
+                            <label for="twilioAuthToken">Twilio Auth Token <span class="required">*</span></label>
+                            <input type="password" id="twilioAuthToken" name="twilioAuthToken" required 
+                                   placeholder="Your Twilio Auth Token" minlength="32">
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="assignedAssistantId">Assign Assistant (Optional)</label>
+                            <select id="assignedAssistantId" name="assignedAssistantId">
+                                <option value="">No Assistant Assigned</option>
+                                <!-- Assistants will be loaded here -->
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <!-- Empty for spacing -->
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="notes">Notes (Optional)</label>
+                        <textarea id="notes" name="notes" placeholder="Optional notes about this phone number"></textarea>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary" id="addPhoneBtn">Add Phone Number</button>
+                    
+                    <div class="loading" id="addingPhone">
+                        <p>Adding phone number...</p>
+                    </div>
+                    
+                    <div class="result" id="addResult"></div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Documentation Tab -->
+        <div id="docs-tab" class="tab-content">
+            <div class="form-section">
+                <div class="section-title">
+                    VAPI Integration Guide
+                </div>
+                
+                <div class="info-box">
+                    <h4>Phone Number VAPI Integration Mapping</h4>
+                    <p>Complete flow from frontend form to VAPI backend integration</p>
+                </div>
+                
+                <h3 style="color: #667eea; margin: 30px 0 15px 0;">1. Frontend Form Fields</h3>
+                <pre style="background: #2a2a2a; padding: 15px; border-radius: 8px; overflow-x: auto; color: #ccc;">
+{
+  friendlyName: string,          // "Main Sales Line"
+  phoneNumber: string,           // "+14155551234" (E.164 format)
+  twilioAccountSid: string,      // "ACxxxxx..." (32 chars)
+  twilioAuthToken: string,       // Twilio auth token
+  assignedAssistantId?: string,  // Assistant UUID
+  notes?: string                 // Optional notes
+}</pre>
+
+                <h3 style="color: #667eea; margin: 30px 0 15px 0;">2. Backend Processing</h3>
+                <pre style="background: #2a2a2a; padding: 15px; border-radius: 8px; overflow-x: auto; color: #ccc;">
+// Validated data structure
+{
+  phoneNumber: string,           // Validated E.164 format
+  friendlyName: string,          // 1-255 chars
+  twilioAccountSid: string,      // Validated format
+  twilioAuthToken: string,       // Min 32 chars
+  assistantId?: string | null    // UUID or null
+}</pre>
+
+                <h3 style="color: #667eea; margin: 30px 0 15px 0;">3. VAPI API Payload</h3>
+                <pre style="background: #2a2a2a; padding: 15px; border-radius: 8px; overflow-x: auto; color: #ccc;">
+{
+  provider: "twilio",
+  number: "+14155551234",
+  twilioAccountSid: "ACxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+  twilioAuthToken: "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+  name: "Main Sales Line",
+  assistantId: "aafd4a02-523b-4675-8341-cfcc9b7a9a04" 
+}</pre>
+
+                <h3 style="color: #667eea; margin: 30px 0 15px 0;">4. Database Storage</h3>
+                <pre style="background: #2a2a2a; padding: 15px; border-radius: 8px; overflow-x: auto; color: #ccc;">
+phone_numbers table:
+{
+  id: UUID,
+  user_id: UUID,
+  phone_number: "+14155551234",
+  friendly_name: "Main Sales Line",
+  provider: "twilio",
+  vapi_phone_id: "abc123...",          -- From VAPI response
+  vapi_credential_id: "cred123...",    -- From VAPI response
+  twilio_account_sid: "ACxxxxx...",
+  twilio_auth_token: "encrypted...",   -- Should be encrypted
+  assigned_assistant_id: UUID,
+  created_at: timestamp,
+  updated_at: timestamp
+}</pre>
+
+                <h3 style="color: #667eea; margin: 30px 0 15px 0;">5. Error Handling</h3>
+                <ul style="color: #ccc; margin-left: 20px;">
+                    <li><strong>400 Bad Request:</strong> Invalid phone format or phone already in use</li>
+                    <li><strong>401 Unauthorized:</strong> Invalid VAPI API key</li>
+                    <li><strong>403 Forbidden:</strong> User lacks permission to manage phone numbers</li>
+                    <li><strong>409 Conflict:</strong> Phone number already exists for user</li>
+                </ul>
+
+                <h3 style="color: #667eea; margin: 30px 0 15px 0;">6. Security Considerations</h3>
+                <ul style="color: #ccc; margin-left: 20px;">
+                    <li><strong>Credential Storage:</strong> Twilio auth tokens should be encrypted in production</li>
+                    <li><strong>Phone Masking:</strong> Log phone numbers with last 4 digits masked</li>
+                    <li><strong>Validation:</strong> Strict E.164 format validation</li>
+                    <li><strong>Permissions:</strong> Users can only manage their own phone numbers</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Phone Number Modal -->
+    <div id="editPhoneModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Edit Phone Number</h3>
+                <button class="close-btn" onclick="closeEditModal()">&times;</button>
+            </div>
+            
+            <form id="editPhoneForm">
+                <input type="hidden" id="editPhoneId" name="phoneId">
+                
+                <div class="form-group">
+                    <label for="editFriendlyName">Friendly Name <span class="required">*</span></label>
+                    <input type="text" id="editFriendlyName" name="friendlyName" required maxlength="255">
+                </div>
+                
+                <div class="form-group">
+                    <label for="editAssignedAssistantId">Assigned Assistant</label>
+                    <select id="editAssignedAssistantId" name="assignedAssistantId">
+                        <option value="">No Assistant Assigned</option>
+                        <!-- Assistants will be loaded here -->
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="editNotes">Notes</label>
+                    <textarea id="editNotes" name="notes"></textarea>
+                </div>
+                
+                <div style="display: flex; gap: 10px; justify-content: flex-end;">
+                    <button type="button" class="btn btn-secondary" onclick="closeEditModal()">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Update Phone Number</button>
+                </div>
+                
+                <div class="result" id="editResult"></div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        let currentTab = 'manage';
+        let phoneNumbers = [];
+        let assistants = [];
+        
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', async function() {
+            await initNavAuth();
+            await loadAssistants();
+            await loadPhoneNumbers();
+            setupEventListeners();
+        });
+        
+        // Initialize navigation authentication
+        async function initNavAuth() {
+            try {
+                const response = await fetch('/api/config/auth');
+                const config = await response.json();
+                
+                if (response.ok) {
+                    const supabase = window.supabase.createClient(config.supabaseUrl, config.supabaseAnonKey);
+                    const { data: { user } } = await supabase.auth.getUser();
+                    if (user) {
+                        document.getElementById('userEmailNav').textContent = user.email;
+                    }
+                }
+            } catch (error) {
+                console.error('Navigation auth error:', error);
+            }
+        }
+        
+        // Navigation sign out
+        async function signOutNav() {
+            try {
+                const response = await fetch('/api/config/auth');
+                const config = await response.json();
+                
+                if (response.ok) {
+                    const supabase = window.supabase.createClient(config.supabaseUrl, config.supabaseAnonKey);
+                    await supabase.auth.signOut();
+                    window.location.href = '/auth.html';
+                }
+            } catch (error) {
+                console.error('Sign out error:', error);
+                window.location.href = '/auth.html';
+            }
+        }
+        
+        function switchTab(tabName) {
+            // Update nav tabs
+            document.querySelectorAll('.nav-tab').forEach(tab => tab.classList.remove('active'));
+            document.querySelector(`[onclick="switchTab('${tabName}')"]`).classList.add('active');
+            
+            // Update tab content
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+            document.getElementById(`${tabName}-tab`).classList.add('active');
+            
+            currentTab = tabName;
+            
+            if (tabName === 'manage') {
+                loadPhoneNumbers();
+            }
+        }
+        
+        async function loadAssistants() {
+            try {
+                const response = await fetch('/api/assistants');
+                const result = await response.json();
+                
+                if (result.success) {
+                    assistants = result.data;
+                    populateAssistantDropdowns();
+                } else {
+                    console.error('Error loading assistants:', result.error);
+                    // Fallback to mock data
+                    assistants = [
+                        { id: '1', name: 'Customer Support Bot' },
+                        { id: '2', name: 'Sales Assistant' }
+                    ];
+                    populateAssistantDropdowns();
+                }
+                
+            } catch (error) {
+                console.error('Error loading assistants:', error);
+                // Fallback to mock data
+                assistants = [
+                    { id: '1', name: 'Customer Support Bot' },
+                    { id: '2', name: 'Sales Assistant' }
+                ];
+                populateAssistantDropdowns();
+            }
+        }
+        
+        function populateAssistantDropdowns() {
+            const dropdowns = [
+                document.getElementById('assignedAssistantId'),
+                document.getElementById('editAssignedAssistantId')
+            ];
+            
+            dropdowns.forEach(dropdown => {
+                // Clear existing options except the first one
+                while (dropdown.children.length > 1) {
+                    dropdown.removeChild(dropdown.lastChild);
+                }
+                
+                assistants.forEach(assistant => {
+                    const option = document.createElement('option');
+                    option.value = assistant.id;
+                    option.textContent = assistant.name;
+                    dropdown.appendChild(option);
+                });
+            });
+        }
+        
+        async function loadPhoneNumbers() {
+            const grid = document.getElementById('phoneNumbersGrid');
+            const loading = document.getElementById('loadingNumbers');
+            
+            loading.style.display = 'block';
+            grid.innerHTML = '';
+            
+            try {
+                const response = await fetch('/api/phone-numbers');
+                const result = await response.json();
+                
+                if (result.success) {
+                    phoneNumbers = result.data;
+                    renderPhoneNumbers();
+                } else {
+                    grid.innerHTML = '<p style="color: #e74c3c; text-align: center;">Failed to load phone numbers: ' + result.error + '</p>';
+                }
+                
+            } catch (error) {
+                console.error('Error loading phone numbers:', error);
+                grid.innerHTML = '<p style="color: #e74c3c; text-align: center;">Failed to load phone numbers</p>';
+            } finally {
+                loading.style.display = 'none';
+            }
+        }
+        
+        function renderPhoneNumbers() {
+            const grid = document.getElementById('phoneNumbersGrid');
+            
+            if (phoneNumbers.length === 0) {
+                grid.innerHTML = '<p style="color: #ccc; text-align: center;">No phone numbers found. Add your first phone number to get started.</p>';
+                return;
+            }
+            
+            grid.innerHTML = phoneNumbers.map(phone => `
+                <div class="phone-number-card">
+                    <div class="phone-header">
+                        <div>
+                            <div class="phone-title">${phone.friendlyName}</div>
+                            <div class="phone-number">${phone.phoneNumber}</div>
+                        </div>
+                        <div class="status-badge status-${phone.status}">${phone.status}</div>
+                    </div>
+                    
+                    <div class="phone-details">
+                        <div class="detail-item">
+                            <div class="detail-label">Provider</div>
+                            <div class="detail-value">${phone.provider}</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">VAPI Phone ID</div>
+                            <div class="detail-value">${phone.vapiPhoneId}</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">Assigned Assistant</div>
+                            <div class="detail-value">${phone.assignedAssistantName || 'None'}</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">Created</div>
+                            <div class="detail-value">${new Date(phone.createdAt).toLocaleDateString()}</div>
+                        </div>
+                    </div>
+                    
+                    ${phone.notes ? `<div style="margin-top: 15px; padding: 10px; background: #333; border-radius: 6px; color: #ccc; font-size: 0.9rem;">${phone.notes}</div>` : ''}
+                    
+                    <div class="card-actions">
+                        <button class="btn btn-secondary btn-small" onclick="editPhone('${phone.id}')">Edit</button>
+                        <button class="btn btn-danger btn-small" onclick="deletePhone('${phone.id}', '${phone.friendlyName}')">Delete</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+        
+        function setupEventListeners() {
+            // Add phone form
+            document.getElementById('addPhoneForm').addEventListener('submit', handleAddPhone);
+            
+            // Edit phone form
+            document.getElementById('editPhoneForm').addEventListener('submit', handleEditPhone);
+            
+            // Phone number format validation
+            document.getElementById('phoneNumber').addEventListener('input', function() {
+                const value = this.value;
+                if (value && !value.startsWith('+')) {
+                    this.value = '+' + value.replace(/^\+/, '');
+                }
+            });
+        }
+        
+        async function handleAddPhone(e) {
+            e.preventDefault();
+            
+            const form = e.target;
+            const formData = new FormData(form);
+            const data = Object.fromEntries(formData.entries());
+            
+            // Show loading
+            document.getElementById('addPhoneBtn').disabled = true;
+            document.getElementById('addingPhone').style.display = 'block';
+            document.getElementById('addResult').style.display = 'none';
+            
+            try {
+                const response = await fetch('/api/phone-numbers', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(data)
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    showResult('addResult', 'success', `Phone number "${data.friendlyName}" added successfully!`);
+                    form.reset();
+                    await loadPhoneNumbers();
+                } else {
+                    showResult('addResult', 'error', result.error + (result.details ? ': ' + result.details.join(', ') : ''));
+                }
+                
+            } catch (error) {
+                console.error('Error adding phone number:', error);
+                showResult('addResult', 'error', 'Failed to add phone number. Please try again.');
+            } finally {
+                document.getElementById('addPhoneBtn').disabled = false;
+                document.getElementById('addingPhone').style.display = 'none';
+            }
+        }
+        
+        function editPhone(phoneId) {
+            const phone = phoneNumbers.find(p => p.id === phoneId);
+            if (!phone) return;
+            
+            // Populate form
+            document.getElementById('editPhoneId').value = phone.id;
+            document.getElementById('editFriendlyName').value = phone.friendlyName;
+            document.getElementById('editAssignedAssistantId').value = phone.assignedAssistantId || '';
+            document.getElementById('editNotes').value = phone.notes || '';
+            
+            // Show modal
+            document.getElementById('editPhoneModal').classList.add('show');
+        }
+        
+        function closeEditModal() {
+            document.getElementById('editPhoneModal').classList.remove('show');
+            document.getElementById('editResult').style.display = 'none';
+        }
+        
+        async function handleEditPhone(e) {
+            e.preventDefault();
+            
+            const form = e.target;
+            const formData = new FormData(form);
+            const data = Object.fromEntries(formData.entries());
+            const phoneId = data.phoneId;
+            
+            try {
+                const response = await fetch(`/api/phone-numbers/${phoneId}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        friendlyName: data.friendlyName,
+                        assignedAssistantId: data.assignedAssistantId || null,
+                        notes: data.notes
+                    })
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    showResult('editResult', 'success', 'Phone number updated successfully!');
+                    
+                    setTimeout(() => {
+                        closeEditModal();
+                        loadPhoneNumbers();
+                    }, 1500);
+                } else {
+                    showResult('editResult', 'error', result.error);
+                }
+                
+            } catch (error) {
+                console.error('Error updating phone number:', error);
+                showResult('editResult', 'error', 'Failed to update phone number. Please try again.');
+            }
+        }
+        
+        async function deletePhone(phoneId, friendlyName) {
+            if (!confirm(`Are you sure you want to delete "${friendlyName}"? This action cannot be undone.`)) {
+                return;
+            }
+            
+            try {
+                const response = await fetch(`/api/phone-numbers/${phoneId}`, {
+                    method: 'DELETE'
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    // Remove from array and re-render
+                    phoneNumbers = phoneNumbers.filter(p => p.id !== phoneId);
+                    renderPhoneNumbers();
+                } else {
+                    alert('Failed to delete phone number: ' + result.error);
+                }
+                
+            } catch (error) {
+                console.error('Error deleting phone number:', error);
+                alert('Failed to delete phone number. Please try again.');
+            }
+        }
+        
+        function showResult(elementId, type, message) {
+            const resultDiv = document.getElementById(elementId);
+            resultDiv.className = `result ${type}`;
+            resultDiv.textContent = message;
+            resultDiv.style.display = 'block';
+        }
+        
+        // Close modal when clicking outside
+        document.getElementById('editPhoneModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeEditModal();
+            }
+        });
+    </script>
+</body>
+</html>

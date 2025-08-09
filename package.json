@@ -1,0 +1,35 @@
+{
+  "name": "voice-matrix",
+  "version": "1.0.0",
+  "description": "Voice Matrix - AI-Powered Voice Agent Platform",
+  "main": "server-fixed.js",
+  "scripts": {
+    "start": "node server-fixed.js",
+    "dev": "nodemon server-fixed.js",
+    "build": "echo 'Build complete'",
+    "vercel-build": "echo 'Vercel build complete'"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "cors": "^2.8.5",
+    "@supabase/supabase-js": "^2.38.0",
+    "axios": "^1.6.0",
+    "dotenv": "^16.3.1"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1"
+  },
+  "keywords": [
+    "voice",
+    "ai",
+    "assistant",
+    "saas",
+    "vapi",
+    "supabase"
+  ],
+  "author": "Voice Matrix Team",
+  "license": "MIT"
+}
