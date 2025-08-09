@@ -24,6 +24,18 @@
       "dest": "/server-fixed.js"
     },
     {
+      "src": "/assistants",
+      "dest": "/server-fixed.js"
+    },
+    {
+      "src": "/phone-numbers",
+      "dest": "/server-fixed.js"
+    },
+    {
+      "src": "/analytics",
+      "dest": "/server-fixed.js"
+    },
+    {
       "src": "/",
       "dest": "/server-fixed.js"
     },

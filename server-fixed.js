@@ -47,6 +47,39 @@ app.get('/dashboard', (req, res) => {
     });
 });
 
+// Assistants route
+app.get('/assistants', (req, res) => {
+    console.log('🤖 Serving assistants page');
+    res.sendFile(path.join(__dirname, 'public', 'assistants.html'), (err) => {
+        if (err) {
+            console.error('❌ Error serving assistants page:', err);
+            res.status(500).send('Error loading assistants page');
+        }
+    });
+});
+
+// Phone Numbers route
+app.get('/phone-numbers', (req, res) => {
+    console.log('📞 Serving phone numbers page');
+    res.sendFile(path.join(__dirname, 'public', 'phone-numbers.html'), (err) => {
+        if (err) {
+            console.error('❌ Error serving phone numbers page:', err);
+            res.status(500).send('Error loading phone numbers page');
+        }
+    });
+});
+
+// Analytics route
+app.get('/analytics', (req, res) => {
+    console.log('📈 Serving analytics page');
+    res.sendFile(path.join(__dirname, 'public', 'analytics.html'), (err) => {
+        if (err) {
+            console.error('❌ Error serving analytics page:', err);
+            res.status(500).send('Error loading analytics page');
+        }
+    });
+});
+
 app.use(express.static('public'));
 
 console.log('✅ Basic middleware configured');
