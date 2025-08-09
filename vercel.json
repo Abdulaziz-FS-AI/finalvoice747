@@ -16,6 +16,10 @@
       "dest": "/server-fixed.js"
     },
     {
+      "src": "/auth",
+      "dest": "/server-fixed.js"
+    },
+    {
       "src": "/dashboard",
       "dest": "/server-fixed.js"
     },
