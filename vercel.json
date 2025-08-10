@@ -8,14 +8,6 @@
   ],
   "routes": [
     {
-      "src": "/css/(.*)",
-      "dest": "/public/css/$1"
-    },
-    {
-      "src": "/js/(.*)",
-      "dest": "/public/js/$1"
-    },
-    {
       "src": "/api/(.*)",
       "dest": "/server-fixed.js"
     },
@@ -24,36 +16,8 @@
       "dest": "/server-fixed.js"
     },
     {
-      "src": "/auth",
-      "dest": "/public/auth.html"
-    },
-    {
-      "src": "/dashboard",
-      "dest": "/public/dashboard.html"
-    },
-    {
-      "src": "/assistants",
-      "dest": "/public/assistants.html"
-    },
-    {
-      "src": "/phone-numbers",
-      "dest": "/public/phone-numbers.html"
-    },
-    {
-      "src": "/analytics",
-      "dest": "/public/analytics.html"
-    },
-    {
-      "src": "/create-assistant",
-      "dest": "/public/create-assistant.html"
-    },
-    {
-      "src": "/",
-      "dest": "/public/landing.html"
-    },
-    {
       "src": "/(.*)",
-      "dest": "/public/$1"
+      "dest": "/server-fixed.js"
     }
   ]
 }
