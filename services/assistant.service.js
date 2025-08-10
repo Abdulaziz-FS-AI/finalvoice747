@@ -8,15 +8,89 @@ class AssistantService {
     // Check if user can create assistant (demo limits)
     async canCreateAssistant(userId) {
         try {
-            const { data, error } = await supabase
-                .rpc('check_user_assistant_limit', { user_uuid: userId });
-                
-            if (error) throw error;
+            // First check if user profile exists and get basic info
+            const { data: profile, error: profileError } = await supabase
+                .from('profiles')
+                .select('is_demo_user, demo_expires_at')
+                .eq('id', userId)
+                .single();
             
-            return data[0];
+            if (profileError) {
+                console.error('Error getting user profile:', profileError);
+                // If profile doesn't exist, allow creation (might be first-time user)
+                console.log('Profile not found, allowing assistant creation for new user');
+                return {
+                    can_create_assistant: true,
+                    assistant_count: 0,
+                    demo_expired: false,
+                    reason: 'new_user'
+                };
+            }
+            
+            // Check if demo account expired
+            const now = new Date();
+            const demoExpired = profile.is_demo_user && 
+                profile.demo_expires_at && 
+                new Date(profile.demo_expires_at) < now;
+            
+            if (demoExpired) {
+                console.log('Demo account expired for user:', userId);
+                return {
+                    can_create_assistant: false,
+                    assistant_count: 0,
+                    demo_expired: true,
+                    reason: 'demo_expired'
+                };
+            }
+            
+            // Count current assistants
+            const { data: assistants, error: countError } = await supabase
+                .from('assistants')
+                .select('id')
+                .eq('user_id', userId);
+            
+            if (countError) {
+                console.error('Error counting assistants:', countError);
+                // On error, be conservative and don't allow creation
+                return {
+                    can_create_assistant: false,
+                    assistant_count: 0,
+                    demo_expired: false,
+                    reason: 'count_error'
+                };
+            }
+            
+            const assistantCount = assistants ? assistants.length : 0;
+            const maxAssistants = profile.is_demo_user ? 1 : 10; // Demo users get 1, others get 10
+            
+            const canCreate = assistantCount < maxAssistants;
+            
+            console.log(`User ${userId} assistant limit check:`, {
+                assistantCount,
+                maxAssistants,
+                canCreate,
+                isDemoUser: profile.is_demo_user,
+                demoExpired
+            });
+            
+            return {
+                can_create_assistant: canCreate,
+                assistant_count: assistantCount,
+                demo_expired: demoExpired,
+                max_assistants: maxAssistants,
+                reason: canCreate ? 'allowed' : 'limit_reached'
+            };
+            
         } catch (error) {
             console.error('Error checking assistant limit:', error);
-            return { can_create_assistant: false };
+            // On unexpected error, allow creation to avoid blocking users
+            console.log('Unexpected error, allowing assistant creation');
+            return {
+                can_create_assistant: true,
+                assistant_count: 0,
+                demo_expired: false,
+                reason: 'error_fallback'
+            };
         }
     }
     

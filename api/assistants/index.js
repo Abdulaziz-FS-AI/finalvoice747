@@ -67,36 +67,67 @@ router.get('/:id', requireAuth, async (req, res) => {
 // POST /api/assistants - Create new assistant
 router.post('/', requireAuth, async (req, res) => {
     try {
+        console.log(`\n🔍 Assistant creation request for user: ${req.userId}`);
+        console.log('📝 Request body:', JSON.stringify(req.body, null, 2));
+        
         // Check limits first
         const limits = await assistantService.canCreateAssistant(req.userId);
+        console.log('📊 Limit check result:', limits);
+        
         if (!limits.can_create_assistant) {
-            // Silent failure - act like success but return null
+            console.log(`❌ Assistant creation blocked:`, {
+                reason: limits.reason,
+                assistantCount: limits.assistant_count,
+                maxAssistants: limits.max_assistants,
+                demoExpired: limits.demo_expired
+            });
+            
+            // Return more informative response for debugging
             return res.json({
                 success: true,
-                data: null
+                data: null,
+                debug: {
+                    blocked: true,
+                    reason: limits.reason,
+                    assistantCount: limits.assistant_count,
+                    maxAssistants: limits.max_assistants,
+                    demoExpired: limits.demo_expired
+                }
             });
         }
+        
+        console.log('✅ Limit check passed, creating assistant...');
         
         // Create assistant
         const assistant = await assistantService.createAssistant(req.userId, req.body);
         
         if (!assistant) {
-            // Silent failure for limit exceeded
+            console.log('❌ Assistant creation failed in service layer');
             return res.json({
                 success: true,
-                data: null
+                data: null,
+                debug: {
+                    blocked: true,
+                    reason: 'service_creation_failed'
+                }
             });
         }
+        
+        console.log('✅ Assistant created successfully:', assistant.id);
         
         res.json({
             success: true,
             data: assistant
         });
     } catch (error) {
-        console.error('Error creating assistant:', error);
+        console.error('💥 Error creating assistant:', error);
         res.status(500).json({
             success: false,
-            error: 'Failed to create assistant'
+            error: 'Failed to create assistant',
+            debug: {
+                error: error.message,
+                stack: error.stack
+            }
         });
     }
 });
