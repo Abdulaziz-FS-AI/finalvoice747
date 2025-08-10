@@ -1,7 +1,7 @@
 // Assistant Service
 // This service handles all assistant-related operations with Supabase
 
-const { supabase } = require('./supabase.service');
+const { supabase, supabaseAdmin } = require('./supabase.service');
 const vapiService = require('./vapi.service');
 
 class AssistantService {
@@ -169,8 +169,9 @@ class AssistantService {
             
             console.log('✅ VAPI ASSISTANT CREATED:', vapiAssistant.id);
             
-            // Store in database
-            const { data, error } = await supabase
+            // Store in database using service role to bypass RLS
+            console.log('💾 INSERTING TO DATABASE...');
+            const { data, error } = await supabaseAdmin
                 .from('assistants')
                 .insert({
                     user_id: userId,
@@ -180,6 +181,8 @@ class AssistantService {
                 })
                 .select()
                 .single();
+                
+            console.log('💾 DATABASE RESULT:', { data, error });
                 
             if (error) {
                 // Rollback VAPI creation

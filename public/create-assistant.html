@@ -848,10 +848,10 @@
                             console.log('🎵 Voice selected:', this.value);
                             console.log('🎵 Voice element:', this);
                             if (this.value) {
-                                this.style.cssText = 'color: #00FF88 !important; font-weight: 600 !important; background: rgba(0, 255, 136, 0.1) !important; border-color: #00FF88 !important;';
+                                this.classList.add('selected');
                                 console.log('✅ Voice styling applied');
                             } else {
-                                this.style.cssText = '';
+                                this.classList.remove('selected');
                                 console.log('❌ Voice styling cleared');
                             }
                         });
@@ -860,7 +860,9 @@
                         voiceSelect.addEventListener('input', function() {
                             console.log('🎵 Voice input event:', this.value);
                             if (this.value) {
-                                this.style.cssText = 'color: #00FF88 !important; font-weight: 600 !important; background: rgba(0, 255, 136, 0.1) !important; border-color: #00FF88 !important;';
+                                this.classList.add('selected');
+                            } else {
+                                this.classList.remove('selected');
                             }
                         });
                     } else {
@@ -914,10 +916,10 @@
                     console.log('📊 Evaluation method selected:', this.value);
                     console.log('📊 Eval element:', this);
                     if (this.value) {
-                        this.style.cssText = 'color: #00FF88 !important; font-weight: 600 !important; background: rgba(0, 255, 136, 0.1) !important; border-color: #00FF88 !important;';
+                        this.classList.add('selected');
                         console.log('✅ Evaluation styling applied');
                     } else {
-                        this.style.cssText = '';
+                        this.classList.remove('selected');
                         console.log('❌ Evaluation styling cleared');
                     }
                 });
@@ -926,7 +928,9 @@
                 evalSelect.addEventListener('input', function() {
                     console.log('📊 Eval input event:', this.value);
                     if (this.value) {
-                        this.style.cssText = 'color: #00FF88 !important; font-weight: 600 !important; background: rgba(0, 255, 136, 0.1) !important; border-color: #00FF88 !important;';
+                        this.classList.add('selected');
+                    } else {
+                        this.classList.remove('selected');
                     }
                 });
                 

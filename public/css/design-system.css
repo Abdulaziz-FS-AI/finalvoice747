@@ -347,6 +347,44 @@ body {
   background-repeat: no-repeat;
   background-size: 16px 12px;
   padding-right: var(--space-10);
+  cursor: pointer;
+}
+
+.select:focus {
+  outline: none;
+  border-color: var(--border-focus);
+  box-shadow: var(--shadow-focus);
+}
+
+/* Dropdown Options */
+.select option {
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  padding: var(--space-3);
+  font-size: 16px;
+  border: none;
+}
+
+.select option:hover {
+  background-color: var(--bg-hover);
+}
+
+.select option:checked {
+  background-color: var(--color-primary);
+  color: white;
+}
+
+/* Selected state styling */
+.select.selected {
+  color: #00FF88 !important;
+  font-weight: 600 !important;
+  background-color: rgba(0, 255, 136, 0.1) !important;
+  border-color: #00FF88 !important;
+}
+
+/* Custom dropdown arrow for selected state */
+.select.selected {
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%2300FF88' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m6 8 4 4 4-4'/%3e%3c/svg%3e");
 }
 
 /* Navigation */
