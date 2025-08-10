@@ -14,6 +14,17 @@ const PORT = process.env.PORT || 8080;
 app.use(cors());
 app.use(express.json());
 
+// IMPORTANT: Serve static files (CSS, JS) with proper path and logging
+app.use('/css', (req, res, next) => {
+    console.log(`📁 CSS request: ${req.url}`);
+    express.static(path.join(__dirname, 'public', 'css'))(req, res, next);
+});
+
+app.use('/js', (req, res, next) => {
+    console.log(`📁 JS request: ${req.url}`);
+    express.static(path.join(__dirname, 'public', 'js'))(req, res, next);
+});
+
 // Root route MUST come before static middleware to override index.html
 app.get('/', (req, res) => {
     console.log('🏠 Serving landing page');
@@ -91,7 +102,8 @@ app.get('/create-assistant', (req, res) => {
     });
 });
 
-app.use(express.static('public'));
+// Static files for any other assets (images, etc.)
+app.use(express.static(path.join(__dirname, 'public')));
 
 console.log('✅ Basic middleware configured');
 
