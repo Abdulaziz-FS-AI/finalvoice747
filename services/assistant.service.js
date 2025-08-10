@@ -417,7 +417,7 @@ QUESTION STRATEGY FOR SHORT CALLS:
     
     // Build VAPI payload
     buildVAPIPayload(formData, systemPrompt) {
-        // Start with minimal working payload
+        // Build comprehensive VAPI payload with all form data
         const payload = {
             name: formData.name || "Voice Assistant",
             model: {
@@ -428,18 +428,71 @@ QUESTION STRATEGY FOR SHORT CALLS:
                         role: "system",
                         content: systemPrompt || "You are a helpful assistant."
                     }
-                ]
+                ],
+                maxTokens: 500,
+                temperature: 0.7
             },
             voice: {
                 provider: "playht",
-                voiceId: "jennifer"
+                voiceId: formData.voice_id || "jennifer"
             },
-            firstMessage: formData.first_message || "Hello! How can I help you today?"
+            transcriber: {
+                provider: "deepgram",
+                model: "nova-2-general",
+                language: "en"
+            },
+            firstMessage: formData.first_message || "Hello! How can I help you today?",
+            firstMessageMode: "assistant-speaks-first",
+            recordingEnabled: true,
+            fillersEnabled: true,
+            silenceTimeoutSeconds: 30,
+            responseDelaySeconds: 0.4,
+            endCallMessage: "Thank you for calling! Have a great day!"
         };
 
         // Add optional fields only if they have valid values
         if (formData.max_call_duration && formData.max_call_duration > 0) {
             payload.maxDurationSeconds = parseInt(formData.max_call_duration);
+        }
+
+        // Add background sound if specified
+        if (formData.background_sound && formData.background_sound !== 'none') {
+            payload.backgroundSound = formData.background_sound;
+        }
+
+        // Add analysis plan if structured questions exist
+        if (formData.structured_questions && formData.structured_questions.length > 0) {
+            const structuredDataSchema = this.buildStructuredDataSchema(formData.structured_questions);
+            if (structuredDataSchema) {
+                payload.analysisPlan = {
+                    summaryPlan: {
+                        enabled: true,
+                        timeoutSeconds: 30
+                    },
+                    structuredDataPlan: {
+                        enabled: true,
+                        schema: structuredDataSchema,
+                        timeoutSeconds: 30
+                    }
+                };
+            }
+        }
+
+        // Add evaluation plan if specified
+        if (formData.evaluation_method && formData.evaluation_method !== 'NoEvaluation') {
+            if (!payload.analysisPlan) {
+                payload.analysisPlan = {
+                    summaryPlan: {
+                        enabled: true,
+                        timeoutSeconds: 30
+                    }
+                };
+            }
+            payload.analysisPlan.successEvaluationPlan = {
+                rubric: formData.evaluation_method,
+                enabled: true,
+                timeoutSeconds: 30
+            };
         }
 
         console.log('🔧 VAPI Payload built:', JSON.stringify(payload, null, 2));
