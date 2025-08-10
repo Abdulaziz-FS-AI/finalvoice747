@@ -709,6 +709,16 @@
 
         // Initialize everything
         document.addEventListener('DOMContentLoaded', async function() {
+            // Check for error parameters in URL
+            const urlParams = new URLSearchParams(window.location.search);
+            const errorMessage = urlParams.get('error');
+            if (errorMessage) {
+                console.error('Auth error from redirect:', errorMessage);
+                showError(decodeURIComponent(errorMessage));
+                // Clean the URL
+                window.history.replaceState({}, document.title, window.location.pathname);
+            }
+
             await initSupabase();
             await checkExistingAuth();
             setupAuthListener();
