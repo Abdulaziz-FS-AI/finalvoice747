@@ -460,7 +460,6 @@
     </style>
     
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="/js/auth-helper.js"></script>
 </head>
 <body>
     <!-- Modern Navigation -->
@@ -604,68 +603,27 @@
 
     <script>
         // Global variables
+        let supabaseClient = null;
         let currentUser;
         let questionCount = 0;
         
         // Initialize page
         document.addEventListener('DOMContentLoaded', async function() {
             console.log('🚀 Create Assistant page loading...');
-            console.log('🌐 Current URL:', window.location.href);
-            console.log('🔄 Document referrer:', document.referrer);
-            
-            // Detect potential redirect loops
-            const sessionKey = 'createAssistantAttempts';
-            let attempts = parseInt(sessionStorage.getItem(sessionKey) || '0');
-            attempts++;
-            sessionStorage.setItem(sessionKey, attempts.toString());
-            
-            if (attempts > 3) {
-                console.warn('⚠️ Possible redirect loop detected. Attempts:', attempts);
-                alert('There seems to be an issue loading the Create Assistant page. Please try:\n\n1. Clear your browser cache\n2. Sign out and sign back in\n3. Contact support if the issue persists');
-                sessionStorage.removeItem(sessionKey);
-                window.location.href = '/dashboard';
-                return;
-            }
-            
-            console.log('📊 Page load attempt #' + attempts);
             
             try {
-                // Add loading state
-                const loadingDiv = document.createElement('div');
-                loadingDiv.id = 'authLoading';
-                loadingDiv.innerHTML = `
-                    <div style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(10, 14, 26, 0.95); z-index: 9999; display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 1rem;">
-                        <div style="width: 48px; height: 48px; border: 3px solid rgba(255, 255, 255, 0.1); border-top: 3px solid #0052FF; border-radius: 50%; animation: spin 1s linear infinite;"></div>
-                        <p style="color: rgba(255, 255, 255, 0.8); font-family: var(--font-body);">Checking authentication... (Attempt ${attempts})</p>
-                    </div>
-                `;
-                document.body.appendChild(loadingDiv);
-                
-                // Check if requireAuth is available
-                if (typeof requireAuth === 'undefined') {
-                    console.error('❌ requireAuth function not available');
-                    // Try to redirect to auth page
-                    setTimeout(() => {
-                        window.location.href = '/auth';
-                    }, 1000);
-                    return;
-                }
+                // Initialize Supabase authentication
+                await initSupabaseAuth();
                 
                 console.log('🔐 Checking authentication...');
-                currentUser = await requireAuth();
+                currentUser = await requireAuthSimple();
                 
                 if (!currentUser) {
-                    console.log('❌ Authentication failed - user will be redirected');
+                    console.log('❌ Authentication failed - redirecting');
                     return;
                 }
                 
                 console.log('✅ User authenticated:', currentUser.email);
-                
-                // Remove loading overlay
-                const loadingElement = document.getElementById('authLoading');
-                if (loadingElement) {
-                    loadingElement.remove();
-                }
                 
                 // Update user email in nav
                 document.getElementById('userEmail').textContent = currentUser.email;
@@ -676,75 +634,51 @@
                 setupEventListeners();
                 console.log('✅ Create Assistant page fully loaded');
                 
-                // Reset session counter on successful load
-                sessionStorage.removeItem(sessionKey);
-                
             } catch (error) {
                 console.error('❌ Initialization error:', error);
-                
-                // Remove loading overlay
-                const loadingElement = document.getElementById('authLoading');
-                if (loadingElement) {
-                    loadingElement.remove();
-                }
-                
-                // Show detailed error information with bypass option
-                const errorDiv = document.getElementById('result') || document.createElement('div');
-                errorDiv.id = 'result';
-                errorDiv.className = 'result error';
-                errorDiv.style.display = 'block';
-                errorDiv.innerHTML = `
-                    <h3>Failed to load Create Assistant page</h3>
-                    <p><strong>Error:</strong> ${error.message}</p>
-                    <p><strong>Please try:</strong></p>
-                    <ol>
-                        <li>Refreshing the page</li>
-                        <li>Clearing browser cache and cookies</li>
-                        <li>Signing out and back in</li>
-                        <li>Checking your internet connection</li>
-                    </ol>
-                    <br>
-                    <button onclick="window.location.href='/dashboard'" style="margin-right: 10px; padding: 10px 20px; background: var(--neural-blue); color: white; border: none; border-radius: 8px; cursor: pointer;">
-                        ← Back to Dashboard
-                    </button>
-                    <button onclick="forceBypassAuth()" style="padding: 10px 20px; background: var(--cyber-green); color: white; border: none; border-radius: 8px; cursor: pointer;">
-                        Try Bypass Mode
-                    </button>
-                `;
-                
-                if (!document.getElementById('result')) {
-                    document.querySelector('.container').appendChild(errorDiv);
-                }
+                showResult('error', 'Failed to load page: ' + error.message);
             }
         });
         
-        // Emergency bypass function for stuck users
-        function forceBypassAuth() {
-            console.log('🚨 Emergency bypass mode activated');
-            sessionStorage.removeItem('createAssistantAttempts');
-            
-            // Remove loading overlay
-            const loadingElement = document.getElementById('authLoading');
-            if (loadingElement) {
-                loadingElement.remove();
-            }
-            
-            // Hide error message
-            const errorElement = document.getElementById('result');
-            if (errorElement) {
-                errorElement.style.display = 'none';
-            }
-            
-            // Try to load the page without auth check
+        // Initialize Supabase authentication
+        async function initSupabaseAuth() {
             try {
-                console.log('⚠️ Loading page without authentication check');
-                document.getElementById('userEmail').textContent = 'Guest User';
-                loadConfig();
-                setupEventListeners();
+                const response = await fetch('/api/config/auth');
+                const config = await response.json();
+                
+                if (response.ok) {
+                    const { createClient } = supabase;
+                    supabaseClient = createClient(config.supabaseUrl, config.supabaseAnonKey);
+                    console.log('✅ Supabase client initialized');
+                } else {
+                    throw new Error(config.message || 'Failed to load auth config');
+                }
             } catch (error) {
-                console.error('❌ Bypass mode failed:', error);
-                alert('Bypass mode failed. Please contact support.');
+                console.error('❌ Auth initialization error:', error);
+                throw new Error('Authentication setup failed: ' + error.message);
             }
+        }
+        
+        // Simple auth check without complex redirect logic
+        async function requireAuthSimple() {
+            if (!supabaseClient) {
+                throw new Error('Supabase not initialized');
+            }
+            
+            const { data: { user }, error } = await supabaseClient.auth.getUser();
+            
+            if (error) {
+                console.error('❌ Auth check error:', error);
+                throw error;
+            }
+            
+            if (!user) {
+                console.log('❌ No authenticated user, redirecting to auth');
+                window.location.href = '/auth';
+                return null;
+            }
+            
+            return user;
         }
         
         async function loadConfig() {
@@ -919,7 +853,7 @@
             document.getElementById('result').style.display = 'none';
             
             try {
-                const response = await authenticatedFetch('/api/assistants', {
+                const response = await authenticatedFetchSimple('/api/assistants', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
@@ -954,6 +888,27 @@
                 document.getElementById('createBtn').disabled = false;
                 document.getElementById('loading').style.display = 'none';
             }
+        }
+        
+        // Simplified authenticated fetch
+        async function authenticatedFetchSimple(url, options = {}) {
+            if (!supabaseClient) {
+                throw new Error('Not authenticated');
+            }
+            
+            const { data: { session } } = await supabaseClient.auth.getSession();
+            if (!session) {
+                window.location.href = '/auth';
+                return null;
+            }
+
+            return fetch(url, {
+                ...options,
+                headers: {
+                    ...options.headers,
+                    'Authorization': `Bearer ${session.access_token}`
+                }
+            });
         }
         
         function showResult(type, message) {

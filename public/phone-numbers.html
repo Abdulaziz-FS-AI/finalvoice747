@@ -933,15 +933,23 @@
         async function signOut() {
             try {
                 const response = await fetch('/api/config/auth');
-                const config = await response.json();
-                
-                if (response.ok) {
-                    const supabase = window.supabase.createClient(config.supabaseUrl, config.supabaseAnonKey);
-                    await supabase.auth.signOut();
+                if (!response.ok) {
                     window.location.href = '/auth';
+                    return;
                 }
+                
+                const config = await response.json();
+                const supabase = window.supabase.createClient(config.supabaseUrl, config.supabaseAnonKey);
+                await supabase.auth.signOut();
+                
+                // Clear any stored auth data
+                sessionStorage.clear();
+                localStorage.removeItem('supabase.auth.token');
+                
+                window.location.href = '/auth';
             } catch (error) {
                 console.error('Sign out error:', error);
+                // Force redirect even if sign out fails
                 window.location.href = '/auth';
             }
         }

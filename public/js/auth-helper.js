@@ -1,9 +1,24 @@
-// auth-helper.js - Shared auth utilities for all pages
+// auth-helper.js - Enhanced auth utilities for all pages
 
 let supabaseClient = null;
+let isInitializing = false;
 
-// Initialize Supabase from backend config
+// Initialize Supabase from backend config with retry logic
 async function initializeAuth() {
+    if (isInitializing) {
+        // Wait for existing initialization to complete
+        while (isInitializing && !supabaseClient) {
+            await new Promise(resolve => setTimeout(resolve, 100));
+        }
+        return supabaseClient;
+    }
+    
+    if (supabaseClient) {
+        return supabaseClient;
+    }
+    
+    isInitializing = true;
+    
     try {
         console.log('🔧 Initializing authentication...');
         const response = await fetch('/api/config/auth');
@@ -22,18 +37,23 @@ async function initializeAuth() {
             throw new Error('Invalid authentication configuration');
         }
         
-        const { createClient } = supabase;
-        supabaseClient = createClient(config.supabaseUrl, config.supabaseAnonKey);
-        console.log('✅ Supabase client created successfully');
+        if (typeof window !== 'undefined' && window.supabase && window.supabase.createClient) {
+            supabaseClient = window.supabase.createClient(config.supabaseUrl, config.supabaseAnonKey);
+            console.log('✅ Supabase client created successfully');
+        } else {
+            throw new Error('Supabase library not loaded');
+        }
         
         return supabaseClient;
     } catch (error) {
         console.error('❌ Auth initialization error:', error);
         throw new Error(`Authentication setup failed: ${error.message}`);
+    } finally {
+        isInitializing = false;
     }
 }
 
-// Check if user is authenticated
+// Check if user is authenticated with session fallback
 async function checkAuth() {
     try {
         if (!supabaseClient) {
@@ -42,20 +62,36 @@ async function checkAuth() {
         }
         
         console.log('👤 Checking user authentication status...');
-        const { data: { user }, error } = await supabaseClient.auth.getUser();
         
-        if (error) {
-            console.error('❌ Auth check error:', error);
-            throw new Error(`Authentication check failed: ${error.message}`);
+        // Try getUser first
+        const { data: { user }, error: userError } = await supabaseClient.auth.getUser();
+        
+        if (userError) {
+            console.warn('⚠️ getUser error, trying session fallback:', userError);
         }
         
         if (user) {
-            console.log('✅ User is authenticated:', user.email);
-        } else {
-            console.log('❌ No authenticated user found');
+            console.log('✅ User authenticated via getUser:', user.email);
+            return user;
         }
         
-        return user;
+        // Fallback to session check
+        console.log('🔄 Trying session fallback...');
+        const { data: { session }, error: sessionError } = await supabaseClient.auth.getSession();
+        
+        if (sessionError) {
+            console.error('❌ Session check error:', sessionError);
+            throw new Error(`Authentication check failed: ${sessionError.message}`);
+        }
+        
+        if (session && session.user) {
+            console.log('✅ User authenticated via session:', session.user.email);
+            return session.user;
+        }
+        
+        console.log('❌ No authenticated user found');
+        return null;
+        
     } catch (error) {
         console.error('❌ checkAuth failed:', error);
         throw error;
@@ -70,10 +106,8 @@ async function requireAuth() {
         
         if (!user) {
             console.log('🔀 Redirecting to auth page...');
-            // Add a small delay to prevent immediate redirect loops
-            setTimeout(() => {
-                window.location.href = '/auth';
-            }, 100);
+            // Immediate redirect without delay to prevent UI flashing
+            window.location.href = '/auth';
             return null;
         }
         
@@ -83,14 +117,12 @@ async function requireAuth() {
         console.error('❌ requireAuth failed:', error);
         // On error, still redirect to auth but with error info
         console.log('🔀 Redirecting to auth due to error...');
-        setTimeout(() => {
-            window.location.href = '/auth?error=' + encodeURIComponent(error.message);
-        }, 100);
+        window.location.href = '/auth?error=' + encodeURIComponent(error.message);
         return null;
     }
 }
 
-// Get auth token for API calls
+// Get auth token for API calls with retry
 async function getAuthToken() {
     if (!supabaseClient) {
         await initializeAuth();
@@ -100,30 +132,45 @@ async function getAuthToken() {
     return session?.access_token || null;
 }
 
-// Make authenticated API call
+// Make authenticated API call with automatic retry
 async function authenticatedFetch(url, options = {}) {
     const token = await getAuthToken();
     if (!token) {
-        throw new Error('No authentication token');
+        console.error('❌ No authentication token available');
+        window.location.href = '/auth';
+        return null;
     }
     
     return fetch(url, {
         ...options,
         headers: {
             ...options.headers,
-            'Authorization': `Bearer ${token}`
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
         }
     });
 }
 
-// Sign out
+// Sign out with cleanup
 async function signOut() {
-    if (!supabaseClient) {
-        await initializeAuth();
+    try {
+        if (!supabaseClient) {
+            await initializeAuth();
+        }
+        
+        console.log('🚪 Signing out...');
+        await supabaseClient.auth.signOut();
+        
+        // Clear any stored auth data
+        sessionStorage.clear();
+        localStorage.removeItem('supabase.auth.token');
+        
+        window.location.href = '/auth';
+    } catch (error) {
+        console.error('❌ Sign out error:', error);
+        // Force redirect even if sign out fails
+        window.location.href = '/auth';
     }
-    
-    await supabaseClient.auth.signOut();
-    window.location.href = '/auth';
 }
 
 // Listen for auth state changes
@@ -133,6 +180,17 @@ async function onAuthStateChange(callback) {
     }
     
     supabaseClient.auth.onAuthStateChange((event, session) => {
+        console.log('🔄 Auth state change:', event);
         callback(event, session);
     });
+}
+
+// Export for global access
+if (typeof window !== 'undefined') {
+    window.initializeAuth = initializeAuth;
+    window.checkAuth = checkAuth;
+    window.requireAuth = requireAuth;
+    window.authenticatedFetch = authenticatedFetch;
+    window.signOut = signOut;
+    window.onAuthStateChange = onAuthStateChange;
 }

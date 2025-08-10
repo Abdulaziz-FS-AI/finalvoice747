@@ -18,18 +18,56 @@
     <script src="/js/theme.js"></script>
     
     <style>
+        /* === ASSISTANTS PAGE MODERN THEME === */
+        body {
+            padding-top: 80px;
+            min-height: 100vh;
+            background: var(--deep-space);
+        }
+        
         .page-header {
-            padding: var(--space-8) 0;
-            background: var(--bg-primary);
-            border-bottom: 1px solid var(--border-default);
+            padding: var(--space-16) 0 var(--space-12) 0;
+            background: linear-gradient(135deg, var(--deep-space) 0%, var(--neural-gray) 50%, var(--deep-space) 100%);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .page-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: var(--gradient-glow);
+            opacity: 0.4;
+        }
+        
+        .page-header .container {
+            position: relative;
+            z-index: 2;
+            text-align: center;
         }
         
         .page-title {
-            margin-bottom: var(--space-2);
+            font-family: var(--font-display);
+            font-size: var(--text-xl);
+            font-weight: 700;
+            line-height: var(--line-tight);
+            margin-bottom: var(--space-4);
+            background: linear-gradient(135deg, var(--text-primary) 0%, rgba(255, 255, 255, 0.8) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
         }
         
         .page-subtitle {
+            font-size: var(--text-lg);
             color: var(--text-secondary);
+            line-height: var(--line-relaxed);
+            max-width: 600px;
+            margin: 0 auto;
         }
         
         .page-actions {
@@ -47,13 +85,15 @@
         }
         
         .assistant-card {
-            background: var(--bg-primary);
-            border: 1px solid var(--border-default);
-            border-radius: var(--radius-lg);
+            background: var(--gradient-card);
+            backdrop-filter: blur(var(--blur-glass));
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: var(--radius-xl);
             padding: var(--space-6);
             transition: all var(--transition-normal);
             position: relative;
             overflow: hidden;
+            box-shadow: var(--shadow-card);
         }
         
         .assistant-card::before {
@@ -63,17 +103,29 @@
             left: 0;
             width: 4px;
             height: 100%;
-            background: var(--color-primary);
+            background: var(--gradient-neural);
             border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
         }
         
         .assistant-card:hover {
-            box-shadow: var(--shadow-md);
-            transform: translateY(-2px);
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-hover);
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+        
+        .assistant-card:hover::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, rgba(0, 82, 255, 0.05) 0%, transparent 50%);
+            opacity: 1;
         }
         
         .assistant-card.inactive::before {
-            background: var(--text-muted);
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.3) 0%, rgba(255, 255, 255, 0.1) 100%);
         }
         
         .assistant-header {
@@ -81,6 +133,8 @@
             justify-content: space-between;
             align-items: flex-start;
             margin-bottom: var(--space-5);
+            position: relative;
+            z-index: 1;
         }
         
         .assistant-info {
@@ -88,20 +142,27 @@
         }
         
         .assistant-name {
-            font-size: 20px;
-            font-weight: var(--font-weight-semibold);
+            font-family: var(--font-display);
+            font-size: 1.25rem;
+            font-weight: 600;
             color: var(--text-primary);
             margin-bottom: var(--space-1);
+            position: relative;
+            z-index: 1;
         }
         
         .assistant-company {
             color: var(--text-secondary);
             font-size: 14px;
-            font-weight: var(--font-weight-medium);
+            font-weight: 500;
+            position: relative;
+            z-index: 1;
         }
         
         .assistant-details {
             margin-bottom: var(--space-5);
+            position: relative;
+            z-index: 1;
         }
         
         .detail-item {
@@ -109,7 +170,7 @@
             justify-content: space-between;
             align-items: center;
             padding: var(--space-3) 0;
-            border-bottom: 1px solid var(--border-default);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
         }
         
         .detail-item:last-child {
@@ -117,30 +178,112 @@
         }
         
         .detail-label {
-            color: var(--text-secondary);
-            font-size: 14px;
-            font-weight: var(--font-weight-medium);
+            color: var(--text-muted);
+            font-size: 12px;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
         
         .detail-value {
             color: var(--text-primary);
-            font-weight: var(--font-weight-medium);
+            font-weight: 500;
             font-size: 14px;
         }
         
         .vapi-id {
             font-family: 'Monaco', 'Menlo', 'Consolas', monospace;
             font-size: 12px;
-            background: var(--bg-secondary);
+            background: rgba(0, 255, 136, 0.1);
+            color: var(--cyber-green);
             padding: var(--space-1) var(--space-2);
             border-radius: var(--radius-sm);
+            border: 1px solid rgba(0, 255, 136, 0.2);
         }
         
         .assistant-actions {
             display: flex;
             gap: var(--space-3);
             padding-top: var(--space-5);
-            border-top: 1px solid var(--border-default);
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            position: relative;
+            z-index: 1;
+        }
+        
+        .badge {
+            padding: var(--space-1) var(--space-3);
+            border-radius: var(--radius-full);
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .badge-success {
+            background: rgba(0, 255, 136, 0.2);
+            color: var(--cyber-green);
+            border: 1px solid var(--cyber-green);
+        }
+        
+        .badge-neutral {
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--text-muted);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .btn {
+            padding: var(--space-3) var(--space-6);
+            border-radius: var(--radius-md);
+            font-weight: 600;
+            font-size: var(--text-sm);
+            cursor: pointer;
+            transition: all var(--transition-normal);
+            border: none;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: var(--space-2);
+            font-family: var(--font-body);
+        }
+        
+        .btn-primary {
+            background: var(--gradient-neural);
+            color: var(--pure-white);
+            box-shadow: var(--shadow-glow);
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-hover);
+        }
+        
+        .btn-secondary {
+            background: var(--glass-white);
+            backdrop-filter: blur(var(--blur-glass));
+            color: var(--text-primary);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateY(-1px);
+        }
+        
+        .btn-danger {
+            background: linear-gradient(135deg, #ff4444 0%, #cc0000 100%);
+            color: var(--pure-white);
+        }
+        
+        .btn-danger:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 20px 40px rgba(255, 68, 68, 0.3);
+        }
+        
+        .btn-sm {
+            padding: var(--space-2) var(--space-4);
+            font-size: 0.875rem;
         }
         
         .loading {
@@ -150,6 +293,20 @@
             padding: var(--space-12);
             gap: var(--space-3);
             color: var(--text-secondary);
+        }
+        
+        .loading-spinner {
+            width: 24px;
+            height: 24px;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-top: 2px solid var(--neural-blue);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
         
         .empty-state {
@@ -168,14 +325,25 @@
         
         .empty-state h3 {
             font-size: 20px;
-            font-weight: var(--font-weight-semibold);
+            font-weight: 600;
             color: var(--text-primary);
             margin-bottom: var(--space-2);
+            font-family: var(--font-display);
         }
         
         .empty-state p {
             color: var(--text-secondary);
             margin-bottom: var(--space-6);
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 var(--space-6);
+        }
+        
+        .section {
+            padding: var(--space-8) 0 var(--space-12) 0;
         }
         
         @media (max-width: 768px) {
@@ -195,7 +363,11 @@
             }
             
             .page-header {
-                padding: var(--space-6) 0;
+                padding: var(--space-12) 0 var(--space-8) 0;
+            }
+            
+            .container {
+                padding: 0 var(--space-4);
             }
         }
     </style>
@@ -232,8 +404,8 @@
     <!-- Page Header -->
     <section class="page-header">
         <div class="container">
-            <h1 class="text-h1 page-title">AI Assistants</h1>
-            <p class="text-lg page-subtitle">Create and manage your voice AI assistants</p>
+            <h1 class="page-title">AI Assistants</h1>
+            <p class="page-subtitle">Create and manage your voice AI assistants</p>
         </div>
     </section>
 
