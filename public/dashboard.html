@@ -782,7 +782,7 @@
             <div class="mb-8">
                 <h2 class="text-h3 mb-8" style="font-family: var(--font-display); color: var(--text-primary); font-weight: 700; text-align: center; font-size: clamp(1.75rem, 3vw, 2rem);">Quick Actions</h2>
                 <div class="quick-actions">
-                    <a href="/create-assistant" class="action-card primary">
+                    <a href="/create-assistant" class="action-card primary" onclick="handleCreateAssistantClick(event)">
                         <div class="action-icon primary">
                             <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
@@ -1060,6 +1060,38 @@
             if (hours > 0) return `${hours} hour${hours > 1 ? 's' : ''} ago`;
             if (minutes > 0) return `${minutes} minute${minutes > 1 ? 's' : ''} ago`;
             return 'Just now';
+        }
+
+        // Handle create assistant navigation
+        function handleCreateAssistantClick(event) {
+            event.preventDefault();
+            console.log('🎯 Create Assistant clicked - navigating...');
+            
+            // Show loading state
+            const card = event.currentTarget;
+            const originalHTML = card.innerHTML;
+            card.style.opacity = '0.7';
+            card.style.pointerEvents = 'none';
+            
+            // Clear any existing redirects and force navigation
+            setTimeout(() => {
+                console.log('🚀 Forcing navigation to /create-assistant');
+                window.location.replace('/create-assistant');
+            }, 100);
+            
+            // Fallback in case replace fails
+            setTimeout(() => {
+                console.log('🔄 Fallback navigation attempt');
+                window.location.href = '/create-assistant';
+            }, 500);
+            
+            // Restore button after a delay if navigation fails
+            setTimeout(() => {
+                card.innerHTML = originalHTML;
+                card.style.opacity = '1';
+                card.style.pointerEvents = 'auto';
+                console.log('❌ Navigation may have failed - button restored');
+            }, 2000);
         }
 
         // Add loading animations

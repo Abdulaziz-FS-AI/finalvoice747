@@ -400,6 +400,24 @@
         // Initialize page
         document.addEventListener('DOMContentLoaded', async function() {
             console.log('🚀 Create Assistant page loading...');
+            console.log('🌐 Current URL:', window.location.href);
+            console.log('🔄 Document referrer:', document.referrer);
+            
+            // Detect potential redirect loops
+            const sessionKey = 'createAssistantAttempts';
+            let attempts = parseInt(sessionStorage.getItem(sessionKey) || '0');
+            attempts++;
+            sessionStorage.setItem(sessionKey, attempts.toString());
+            
+            if (attempts > 3) {
+                console.warn('⚠️ Possible redirect loop detected. Attempts:', attempts);
+                alert('There seems to be an issue loading the Create Assistant page. Please try:\n\n1. Clear your browser cache\n2. Sign out and sign back in\n3. Contact support if the issue persists');
+                sessionStorage.removeItem(sessionKey);
+                window.location.href = '/dashboard';
+                return;
+            }
+            
+            console.log('📊 Page load attempt #' + attempts);
             
             try {
                 // Add loading state
@@ -408,7 +426,7 @@
                 loadingDiv.innerHTML = `
                     <div style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(10, 14, 26, 0.95); z-index: 9999; display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 1rem;">
                         <div style="width: 48px; height: 48px; border: 3px solid rgba(255, 255, 255, 0.1); border-top: 3px solid #0052FF; border-radius: 50%; animation: spin 1s linear infinite;"></div>
-                        <p style="color: rgba(255, 255, 255, 0.8); font-family: var(--font-body);">Checking authentication...</p>
+                        <p style="color: rgba(255, 255, 255, 0.8); font-family: var(--font-body);">Checking authentication... (Attempt ${attempts})</p>
                     </div>
                 `;
                 document.body.appendChild(loadingDiv);
@@ -438,6 +456,9 @@
                 setupEventListeners();
                 console.log('✅ Create Assistant page fully loaded');
                 
+                // Reset session counter on successful load
+                sessionStorage.removeItem(sessionKey);
+                
             } catch (error) {
                 console.error('❌ Initialization error:', error);
                 
@@ -447,10 +468,64 @@
                     loadingElement.remove();
                 }
                 
-                // Show detailed error information
-                showResult('error', `Failed to initialize page: ${error.message}\n\nPlease try:\n1. Refreshing the page\n2. Signing out and back in\n3. Checking your internet connection`);
+                // Show detailed error information with bypass option
+                const errorDiv = document.getElementById('result') || document.createElement('div');
+                errorDiv.id = 'result';
+                errorDiv.className = 'result error';
+                errorDiv.style.display = 'block';
+                errorDiv.innerHTML = `
+                    <h3>Failed to load Create Assistant page</h3>
+                    <p><strong>Error:</strong> ${error.message}</p>
+                    <p><strong>Please try:</strong></p>
+                    <ol>
+                        <li>Refreshing the page</li>
+                        <li>Clearing browser cache and cookies</li>
+                        <li>Signing out and back in</li>
+                        <li>Checking your internet connection</li>
+                    </ol>
+                    <br>
+                    <button onclick="window.location.href='/dashboard'" style="margin-right: 10px; padding: 10px 20px; background: var(--neural-blue); color: white; border: none; border-radius: 8px; cursor: pointer;">
+                        ← Back to Dashboard
+                    </button>
+                    <button onclick="forceBypassAuth()" style="padding: 10px 20px; background: var(--cyber-green); color: white; border: none; border-radius: 8px; cursor: pointer;">
+                        Try Bypass Mode
+                    </button>
+                `;
+                
+                if (!document.getElementById('result')) {
+                    document.querySelector('.container').appendChild(errorDiv);
+                }
             }
         });
+        
+        // Emergency bypass function for stuck users
+        function forceBypassAuth() {
+            console.log('🚨 Emergency bypass mode activated');
+            sessionStorage.removeItem('createAssistantAttempts');
+            
+            // Remove loading overlay
+            const loadingElement = document.getElementById('authLoading');
+            if (loadingElement) {
+                loadingElement.remove();
+            }
+            
+            // Hide error message
+            const errorElement = document.getElementById('result');
+            if (errorElement) {
+                errorElement.style.display = 'none';
+            }
+            
+            // Try to load the page without auth check
+            try {
+                console.log('⚠️ Loading page without authentication check');
+                document.getElementById('userEmail').textContent = 'Guest User';
+                loadConfig();
+                setupEventListeners();
+            } catch (error) {
+                console.error('❌ Bypass mode failed:', error);
+                alert('Bypass mode failed. Please contact support.');
+            }
+        }
         
         async function loadConfig() {
             try {
