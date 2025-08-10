@@ -8,6 +8,14 @@
   ],
   "routes": [
     {
+      "src": "/css/(.*)",
+      "dest": "/public/css/$1"
+    },
+    {
+      "src": "/js/(.*)",
+      "dest": "/public/js/$1"
+    },
+    {
       "src": "/api/(.*)",
       "dest": "/server-fixed.js"
     },
@@ -17,31 +25,31 @@
     },
     {
       "src": "/auth",
-      "dest": "/server-fixed.js"
+      "dest": "/public/auth.html"
     },
     {
       "src": "/dashboard",
-      "dest": "/server-fixed.js"
+      "dest": "/public/dashboard.html"
     },
     {
       "src": "/assistants",
-      "dest": "/server-fixed.js"
+      "dest": "/public/assistants.html"
     },
     {
       "src": "/phone-numbers",
-      "dest": "/server-fixed.js"
+      "dest": "/public/phone-numbers.html"
     },
     {
       "src": "/analytics",
-      "dest": "/server-fixed.js"
+      "dest": "/public/analytics.html"
     },
     {
       "src": "/create-assistant",
-      "dest": "/server-fixed.js"
+      "dest": "/public/create-assistant.html"
     },
     {
       "src": "/",
-      "dest": "/server-fixed.js"
+      "dest": "/public/landing.html"
     },
     {
       "src": "/(.*)",
