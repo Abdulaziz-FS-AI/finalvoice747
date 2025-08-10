@@ -80,10 +80,10 @@ app.get('/analytics', (req, res) => {
     });
 });
 
-// Create Assistant route (index.html)
+// Create Assistant route (create-assistant.html)
 app.get('/create-assistant', (req, res) => {
     console.log('➕ Serving assistant creation page');
-    res.sendFile(path.join(__dirname, 'public', 'index.html'), (err) => {
+    res.sendFile(path.join(__dirname, 'public', 'create-assistant.html'), (err) => {
         if (err) {
             console.error('❌ Error serving assistant creation page:', err);
             res.status(500).send('Error loading assistant creation page');
