@@ -151,6 +151,42 @@ async function authenticatedFetch(url, options = {}) {
     });
 }
 
+// Simple authenticated fetch for create-assistant page
+async function authenticatedFetchSimple(url, options = {}) {
+    try {
+        if (!supabaseClient) {
+            await initializeAuth();
+        }
+        
+        const { data: { session } } = await supabaseClient.auth.getSession();
+        if (!session) {
+            console.error('❌ No session available');
+            window.location.href = '/auth';
+            return null;
+        }
+        
+        const response = await fetch(url, {
+            ...options,
+            headers: {
+                ...options.headers,
+                'Authorization': `Bearer ${session.access_token}`,
+                'Content-Type': 'application/json'
+            }
+        });
+        
+        if (response.status === 401) {
+            console.error('❌ Authentication expired');
+            window.location.href = '/auth';
+            return null;
+        }
+        
+        return response;
+    } catch (error) {
+        console.error('❌ authenticatedFetchSimple error:', error);
+        return null;
+    }
+}
+
 // Sign out with cleanup
 async function signOut() {
     try {
@@ -191,6 +227,7 @@ if (typeof window !== 'undefined') {
     window.checkAuth = checkAuth;
     window.requireAuth = requireAuth;
     window.authenticatedFetch = authenticatedFetch;
+    window.authenticatedFetchSimple = authenticatedFetchSimple;
     window.signOut = signOut;
     window.onAuthStateChange = onAuthStateChange;
 }

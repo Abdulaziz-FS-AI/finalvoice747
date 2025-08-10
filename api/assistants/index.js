@@ -64,11 +64,97 @@ router.get('/:id', requireAuth, async (req, res) => {
     }
 });
 
+// Validate assistant creation data
+function validateAssistantData(data) {
+    const errors = [];
+    
+    // Required fields
+    if (!data.name || typeof data.name !== 'string' || data.name.trim().length === 0) {
+        errors.push('Assistant name is required');
+    } else if (data.name.length > 100) {
+        errors.push('Assistant name must be less than 100 characters');
+    }
+    
+    if (!data.first_message || typeof data.first_message !== 'string' || data.first_message.trim().length === 0) {
+        errors.push('First message is required');
+    } else if (data.first_message.length > 500) {
+        errors.push('First message must be less than 500 characters');
+    }
+    
+    // Optional fields validation
+    if (data.max_call_duration) {
+        const duration = parseInt(data.max_call_duration);
+        if (isNaN(duration) || duration < 30 || duration > 1800) { // 30 seconds to 30 minutes
+            errors.push('Call duration must be between 30 and 1800 seconds');
+        }
+    }
+    
+    if (data.voice_id && (typeof data.voice_id !== 'string' || data.voice_id.length > 50)) {
+        errors.push('Invalid voice ID');
+    }
+    
+    if (data.evaluation_method && !['NumericScale', 'DescriptiveScale', 'Checklist', 'BinaryEvaluation', 'NoEvaluation'].includes(data.evaluation_method)) {
+        errors.push('Invalid evaluation method');
+    }
+    
+    if (data.background_sound && !['office', 'cafe', 'nature', 'none'].includes(data.background_sound)) {
+        errors.push('Invalid background sound option');
+    }
+    
+    // Validate personality traits
+    if (data.personality_traits) {
+        const validTraits = ['Professional', 'Friendly', 'Energetic', 'Calming', 'Confident', 'Empathetic', 'Witty', 'Patient', 'Knowledgeable', 'Supportive'];
+        const traits = Array.isArray(data.personality_traits) ? data.personality_traits : [data.personality_traits];
+        
+        for (const trait of traits) {
+            if (!validTraits.includes(trait)) {
+                errors.push(`Invalid personality trait: ${trait}`);
+            }
+        }
+        
+        if (traits.length > 5) {
+            errors.push('Maximum 5 personality traits allowed');
+        }
+    }
+    
+    // Validate structured questions
+    if (data.structured_questions && Array.isArray(data.structured_questions)) {
+        if (data.structured_questions.length > 10) {
+            errors.push('Maximum 10 structured questions allowed');
+        }
+        
+        data.structured_questions.forEach((q, index) => {
+            if (!q.question || typeof q.question !== 'string' || q.question.trim().length === 0) {
+                errors.push(`Question ${index + 1}: Question text is required`);
+            } else if (q.question.length > 200) {
+                errors.push(`Question ${index + 1}: Question text must be less than 200 characters`);
+            }
+            
+            if (q.description && q.description.length > 300) {
+                errors.push(`Question ${index + 1}: Description must be less than 300 characters`);
+            }
+        });
+    }
+    
+    return errors;
+}
+
 // POST /api/assistants - Create new assistant
 router.post('/', requireAuth, async (req, res) => {
     try {
         console.log(`\n🔍 Assistant creation request for user: ${req.userId}`);
         console.log('📝 Request body:', JSON.stringify(req.body, null, 2));
+        
+        // Validate input data
+        const validationErrors = validateAssistantData(req.body);
+        if (validationErrors.length > 0) {
+            console.log('❌ Validation errors:', validationErrors);
+            return res.status(400).json({
+                success: false,
+                error: 'Validation failed',
+                details: validationErrors
+            });
+        }
         
         // Check limits first
         const limits = await assistantService.canCreateAssistant(req.userId);
@@ -96,7 +182,7 @@ router.post('/', requireAuth, async (req, res) => {
             });
         }
         
-        console.log('✅ Limit check passed, creating assistant...');
+        console.log('✅ Validation passed, limit check passed, creating assistant...');
         
         // Create assistant
         const assistant = await assistantService.createAssistant(req.userId, req.body);

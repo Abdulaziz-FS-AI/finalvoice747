@@ -16,16 +16,22 @@ class VAPIService {
         }
     }
 
-    // Create assistant in VAPI
-    async createAssistant(payload) {
+    // Create assistant in VAPI with retry logic
+    async createAssistant(payload, retryCount = 0) {
         // Check if API key is configured
         if (!this.apiKey) {
             console.error('❌ VAPI API Key not configured');
             return null;
         }
         
+        // Validate payload
+        if (!payload || !payload.name) {
+            console.error('❌ Invalid payload - missing required fields');
+            return null;
+        }
+        
         try {
-            console.log('🎯 VAPI CREATE REQUEST:');
+            console.log(`🎯 VAPI CREATE REQUEST (attempt ${retryCount + 1}/3):`);
             console.log('Base URL:', this.baseUrl);
             console.log('API Key exists:', !!this.apiKey);
             console.log('Payload keys:', Object.keys(payload));
@@ -45,7 +51,7 @@ class VAPIService {
             console.log('✅ VAPI SUCCESS:', response.status, response.statusText);
             return response.data;
         } catch (error) {
-            console.error('❌ VAPI FAILED:', {
+            const errorDetails = {
                 status: error.response?.status,
                 statusText: error.response?.statusText,
                 data: error.response?.data,
@@ -53,7 +59,22 @@ class VAPIService {
                 url: `${this.baseUrl}/assistant`,
                 apiKeyExists: !!this.apiKey,
                 isTimeout: error.code === 'ECONNABORTED'
-            });
+            };
+            
+            console.error(`❌ VAPI FAILED (attempt ${retryCount + 1}/3):`, errorDetails);
+            
+            // Retry on network errors or 5xx errors (not auth errors)
+            if (retryCount < 2 && (
+                error.code === 'ECONNABORTED' || // Timeout
+                error.code === 'ENOTFOUND' ||    // DNS error
+                error.code === 'ECONNRESET' ||   // Connection reset
+                (error.response?.status >= 500)   // Server errors
+            )) {
+                console.log(`🔄 Retrying VAPI request in ${(retryCount + 1) * 2} seconds...`);
+                await new Promise(resolve => setTimeout(resolve, (retryCount + 1) * 2000));
+                return this.createAssistant(payload, retryCount + 1);
+            }
+            
             return null;
         }
     }
