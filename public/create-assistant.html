@@ -697,7 +697,8 @@
                         <div id="structuredQuestions">
                             <!-- Questions added dynamically -->
                         </div>
-                        <button type="button" class="btn btn-secondary" onclick="addStructuredQuestion()">+ Add Question</button>
+                        <button type="button" class="btn btn-secondary" onclick="addStructuredQuestion()" style="background: #00FF88; color: #000; font-weight: 600;">+ Add Question</button>
+                        <small style="color: #888; display: block; margin-top: 8px;">Click to add a custom question for data collection</small>
                     </div>
                     
                     <div class="input-group">
@@ -836,14 +837,21 @@
                         // Add change listener for visual feedback
                         voiceSelect.addEventListener('change', function() {
                             console.log('🎵 Voice selected:', this.value);
+                            console.log('🎵 Voice element:', this);
                             if (this.value) {
-                                this.style.color = '#00FF88';
-                                this.style.fontWeight = '600';
-                                this.style.background = 'rgba(0, 255, 136, 0.1)';
+                                this.style.cssText = 'color: #00FF88 !important; font-weight: 600 !important; background: rgba(0, 255, 136, 0.1) !important; border-color: #00FF88 !important;';
+                                console.log('✅ Voice styling applied');
                             } else {
-                                this.style.color = '';
-                                this.style.fontWeight = '';
-                                this.style.background = '';
+                                this.style.cssText = '';
+                                console.log('❌ Voice styling cleared');
+                            }
+                        });
+                        
+                        // Also add input event for better compatibility
+                        voiceSelect.addEventListener('input', function() {
+                            console.log('🎵 Voice input event:', this.value);
+                            if (this.value) {
+                                this.style.cssText = 'color: #00FF88 !important; font-weight: 600 !important; background: rgba(0, 255, 136, 0.1) !important; border-color: #00FF88 !important;';
                             }
                         });
                     } else {
@@ -895,14 +903,21 @@
                 // Add change listener for visual feedback
                 evalSelect.addEventListener('change', function() {
                     console.log('📊 Evaluation method selected:', this.value);
+                    console.log('📊 Eval element:', this);
                     if (this.value) {
-                        this.style.color = '#00FF88';
-                        this.style.fontWeight = '600';
-                        this.style.background = 'rgba(0, 255, 136, 0.1)';
+                        this.style.cssText = 'color: #00FF88 !important; font-weight: 600 !important; background: rgba(0, 255, 136, 0.1) !important; border-color: #00FF88 !important;';
+                        console.log('✅ Evaluation styling applied');
                     } else {
-                        this.style.color = '';
-                        this.style.fontWeight = '';
-                        this.style.background = '';
+                        this.style.cssText = '';
+                        console.log('❌ Evaluation styling cleared');
+                    }
+                });
+                
+                // Also add input event for better compatibility
+                evalSelect.addEventListener('input', function() {
+                    console.log('📊 Eval input event:', this.value);
+                    if (this.value) {
+                        this.style.cssText = 'color: #00FF88 !important; font-weight: 600 !important; background: rgba(0, 255, 136, 0.1) !important; border-color: #00FF88 !important;';
                     }
                 });
                 
@@ -968,17 +983,24 @@
             if (backgroundSelect) {
                 backgroundSelect.addEventListener('change', function() {
                     console.log('🎧 Background sound selected:', this.value);
+                    console.log('🎧 Background element:', this);
                     if (this.value) {
-                        this.style.color = '#00FF88';
-                        this.style.fontWeight = '600';
-                        this.style.background = 'rgba(0, 255, 136, 0.1)';
+                        this.style.cssText = 'color: #00FF88 !important; font-weight: 600 !important; background: rgba(0, 255, 136, 0.1) !important; border-color: #00FF88 !important;';
+                        console.log('✅ Background styling applied');
                     } else {
-                        this.style.color = '';
-                        this.style.fontWeight = '';
-                        this.style.background = '';
+                        this.style.cssText = '';
+                        console.log('❌ Background styling cleared');
                     }
                 });
-                console.log('✅ Background sound listener set up');
+                
+                // Also add input event for better compatibility
+                backgroundSelect.addEventListener('input', function() {
+                    console.log('🎧 Background input event:', this.value);
+                    if (this.value) {
+                        this.style.cssText = 'color: #00FF88 !important; font-weight: 600 !important; background: rgba(0, 255, 136, 0.1) !important; border-color: #00FF88 !important;';
+                    }
+                });
+                console.log('✅ Background sound listeners set up');
             }
             
             console.log('✅ All event listeners configured');
@@ -986,17 +1008,20 @@
         
         function addStructuredQuestion() {
             console.log('➕ Adding structured question...');
-            questionCount++;
-            const container = document.getElementById('structuredQuestions');
             
-            if (!container) {
-                console.error('❌ Structured questions container not found');
-                alert('Error: Questions container not found! Please refresh the page.');
-                return;
-            }
-            
-            console.log('📝 Question count:', questionCount);
-            console.log('📦 Container found:', container);
+            try {
+                questionCount++;
+                const container = document.getElementById('structuredQuestions');
+                
+                if (!container) {
+                    console.error('❌ Structured questions container not found');
+                    alert('Error: Questions container not found! Please refresh the page.');
+                    return;
+                }
+                
+                console.log('📝 Question count:', questionCount);
+                console.log('📦 Container found:', container);
+                console.log('📦 Container children before:', container.children.length);
             
             const questionDiv = document.createElement('div');
             questionDiv.className = 'question-item';
@@ -1037,8 +1062,23 @@
                 </div>
             `;
             
-            container.appendChild(questionDiv);
-            console.log('✅ Question added successfully! Total questions:', questionCount);
+                container.appendChild(questionDiv);
+                console.log('📦 Container children after:', container.children.length);
+                console.log('✅ Question added successfully! Total questions:', questionCount);
+                
+                // Visual feedback - scroll to new question
+                questionDiv.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                
+                // Flash the new question for visual feedback
+                questionDiv.style.border = '2px solid #00FF88';
+                setTimeout(() => {
+                    questionDiv.style.border = '';
+                }, 2000);
+                
+            } catch (error) {
+                console.error('❌ Error adding question:', error);
+                alert('Error adding question: ' + error.message);
+            }
         }
         
         function removeQuestion(button) {

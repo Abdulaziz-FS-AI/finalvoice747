@@ -66,7 +66,7 @@ class UserLimitsService {
     getPlanLimits(planType) {
         const plans = {
             free: {
-                maxAssistants: 1,
+                maxAssistants: 2,
                 maxCallTimeSeconds: 600 // 10 minutes
             },
             pro: {

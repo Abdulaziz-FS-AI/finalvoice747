@@ -82,7 +82,7 @@ BEGIN
     WHERE a.user_id = user_uuid;
     
     -- Return results
-    can_create_assistant := (assistant_count_val < 1 AND NOT demo_expired);
+    can_create_assistant := (assistant_count_val < 2 AND NOT demo_expired);
     assistant_count := assistant_count_val;
     
     RETURN NEXT;

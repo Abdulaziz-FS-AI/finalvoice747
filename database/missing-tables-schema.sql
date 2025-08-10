@@ -18,7 +18,7 @@ CREATE TABLE public.user_limits (
     plan_type TEXT DEFAULT 'free' CHECK (plan_type IN ('free', 'pro', 'business', 'enterprise')),
     
     -- Limits (max allowed)
-    max_assistants INTEGER DEFAULT 1,
+    max_assistants INTEGER DEFAULT 2,
     max_call_time_seconds INTEGER DEFAULT 600, -- 10 minutes for free plan
     
     -- Current usage
@@ -174,7 +174,7 @@ BEGIN
     ) VALUES (
         NEW.id,
         'free', -- Default to free plan
-        1,      -- 1 assistant for free plan
+        2,      -- 2 assistants for free plan
         600,    -- 10 minutes for free plan
         0,      -- Start with 0 assistants
         0       -- Start with 0 usage
