@@ -17,6 +17,9 @@
     <!-- Theme Management -->
     <script src="/js/theme.js"></script>
     
+    <!-- Supabase for auth check -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
     <style>
         /* ===============================================
            MODERN 2025 SHADCN-INSPIRED DESIGN SYSTEM
@@ -1218,6 +1221,34 @@
             }
         `;
         document.head.appendChild(style);
+        
+        // Check if user is already authenticated and redirect to dashboard
+        async function checkAuthAndRedirect() {
+            try {
+                const response = await fetch('/api/config/auth');
+                if (!response.ok) return; // No auth config, skip check
+                
+                const config = await response.json();
+                if (!config.supabaseUrl || config.supabaseUrl === 'your_supabase_url_here') return;
+                
+                // Initialize Supabase
+                const supabase = window.supabase?.createClient(config.supabaseUrl, config.supabaseAnonKey);
+                if (!supabase) return;
+                
+                // Check if user is authenticated
+                const { data: { user } } = await supabase.auth.getUser();
+                if (user) {
+                    console.log('User already authenticated, redirecting to dashboard');
+                    window.location.href = '/dashboard';
+                }
+            } catch (error) {
+                // Silent fail - don't show errors on landing page
+                console.log('Auth check failed silently:', error);
+            }
+        }
+        
+        // Run auth check on page load
+        checkAuthAndRedirect();
     </script>
 </body>
 </html>

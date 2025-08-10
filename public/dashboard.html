@@ -168,6 +168,46 @@
             font-weight: 700;
             color: var(--text-primary);
             text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: var(--space-3);
+            transition: all var(--transition-normal);
+        }
+        
+        .nav-brand:hover {
+            transform: translateY(-1px);
+        }
+
+        .nav-logo {
+            width: 40px;
+            height: 40px;
+            background: var(--gradient-neural);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: var(--shadow-glow);
+            position: relative;
+            overflow: hidden;
+            flex-shrink: 0;
+        }
+
+        .nav-logo::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            animation: shine 2s infinite;
+        }
+
+        .nav-logo svg {
+            width: 24px;
+            height: 24px;
+            color: white;
+            z-index: 1;
         }
         
         .nav-tabs {
@@ -622,10 +662,35 @@
             padding: 0 var(--space-6);
         }
         
+        /* === ANIMATIONS === */
+        @keyframes shine {
+            0% { left: -100%; }
+            50% { left: 100%; }
+            100% { left: 100%; }
+        }
+        
         /* === RESPONSIVE DESIGN === */
         @media (max-width: 768px) {
             .dashboard-header {
                 padding: var(--space-12) 0;
+            }
+            
+            .nav-tabs {
+                display: none;
+            }
+            
+            .nav-brand {
+                font-size: 1.25rem;
+            }
+            
+            .nav-logo {
+                width: 36px;
+                height: 36px;
+            }
+            
+            .nav-logo svg {
+                width: 20px;
+                height: 20px;
             }
             
             .stats-grid {
@@ -857,16 +922,78 @@
 
         // Initialize
         async function init() {
-            await initSupabase();
-            currentUser = await requireAuth();
-            if (!currentUser) return;
+            try {
+                // Show loading state
+                showDashboardLoading(true);
+                
+                await initSupabase();
+                currentUser = await requireAuth();
+                if (!currentUser) return;
 
-            // Update UI with user info
-            document.getElementById('userEmail').textContent = currentUser.email;
+                // Update UI with user info
+                document.getElementById('userEmail').textContent = currentUser.email;
 
-            // Load dashboard data
-            await loadDashboardData();
-            await loadRecentActivity();
+                // Load dashboard data
+                await loadDashboardData();
+                await loadRecentActivity();
+                
+                // Hide loading state
+                showDashboardLoading(false);
+            } catch (error) {
+                console.error('Dashboard initialization failed:', error);
+                showDashboardLoading(false);
+            }
+        }
+        
+        // Show/hide dashboard loading state
+        function showDashboardLoading(show) {
+            const mainContent = document.querySelector('main');
+            const navbar = document.querySelector('nav');
+            
+            if (show) {
+                // Create loading overlay if it doesn't exist
+                let loadingOverlay = document.getElementById('dashboardLoading');
+                if (!loadingOverlay) {
+                    loadingOverlay = document.createElement('div');
+                    loadingOverlay.id = 'dashboardLoading';
+                    loadingOverlay.style.cssText = `
+                        position: fixed;
+                        top: 0;
+                        left: 0;
+                        right: 0;
+                        bottom: 0;
+                        background: var(--deep-space);
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        flex-direction: column;
+                        gap: var(--space-4);
+                        z-index: 9999;
+                        color: var(--text-primary);
+                    `;
+                    loadingOverlay.innerHTML = `
+                        <div style="width: 48px; height: 48px; border: 3px solid rgba(255, 255, 255, 0.1); border-top: 3px solid var(--neural-blue); border-radius: 50%; animation: spin 1s linear infinite;"></div>
+                        <p style="font-size: 1.125rem; color: var(--text-secondary);">Loading your dashboard...</p>
+                    `;
+                    document.body.appendChild(loadingOverlay);
+                }
+                loadingOverlay.style.display = 'flex';
+                if (mainContent) mainContent.style.opacity = '0';
+                if (navbar) navbar.style.opacity = '0';
+            } else {
+                const loadingOverlay = document.getElementById('dashboardLoading');
+                if (loadingOverlay) {
+                    loadingOverlay.style.display = 'none';
+                }
+                if (mainContent) {
+                    mainContent.style.opacity = '1';
+                    mainContent.style.transition = 'opacity 0.3s ease';
+                }
+                if (navbar) {
+                    navbar.style.opacity = '1';
+                    navbar.style.transition = 'opacity 0.3s ease';
+                }
+            }
         }
 
         // Initialize Supabase
@@ -885,16 +1012,39 @@
             }
         }
 
-        // Require authentication
+        // Require authentication with retry logic
         async function requireAuth() {
             if (!supabase) return null;
 
-            const { data: { user } } = await supabase.auth.getUser();
-            if (!user) {
+            try {
+                // First try to get user
+                const { data: { user }, error } = await supabase.auth.getUser();
+                
+                if (error) {
+                    console.error('Auth error:', error);
+                    throw error;
+                }
+                
+                if (!user) {
+                    // Check if we have a session that's still loading
+                    const { data: { session } } = await supabase.auth.getSession();
+                    if (session && session.user) {
+                        console.log('Found session, using session user');
+                        return session.user;
+                    }
+                    
+                    console.log('No user or session found, redirecting to auth');
+                    window.location.href = '/auth';
+                    return null;
+                }
+                
+                console.log('User authenticated:', user.email);
+                return user;
+            } catch (error) {
+                console.error('Authentication check failed:', error);
                 window.location.href = '/auth';
                 return null;
             }
-            return user;
         }
 
         // Sign out

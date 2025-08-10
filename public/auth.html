@@ -39,7 +39,7 @@
         /* === LEFT SIDE - BRANDING & INSPIRATION === */
         .auth-brand-side {
             flex: 1;
-            background: linear-gradient(135deg, #0A0E1A 0%, #1A1F2E 50%, #0A0E1A 100%);
+            background: linear-gradient(135deg, #0B0D21 0%, #1A0F2E 30%, #2D1B4E 60%, #0B0D21 100%);
             position: relative;
             display: flex;
             align-items: center;
@@ -54,8 +54,11 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background: radial-gradient(circle at 50% 0%, rgba(0, 82, 255, 0.3) 0%, transparent 70%);
-            opacity: 0.8;
+            background: 
+                radial-gradient(circle at 30% 20%, rgba(139, 69, 255, 0.4) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(59, 130, 246, 0.3) 0%, transparent 50%),
+                radial-gradient(circle at 20% 80%, rgba(168, 85, 247, 0.2) 0%, transparent 60%);
+            opacity: 0.9;
         }
         
         .auth-brand-side::after {
@@ -66,9 +69,9 @@
             right: 0;
             bottom: 0;
             background-image: 
-                radial-gradient(circle at 20% 30%, rgba(0, 255, 136, 0.15) 0%, transparent 50%),
-                radial-gradient(circle at 80% 70%, rgba(123, 97, 255, 0.15) 0%, transparent 50%),
-                radial-gradient(circle at 60% 20%, rgba(0, 82, 255, 0.2) 0%, transparent 50%);
+                linear-gradient(45deg, transparent 30%, rgba(139, 69, 255, 0.1) 50%, transparent 70%),
+                radial-gradient(circle at 70% 30%, rgba(0, 255, 136, 0.1) 0%, transparent 50%),
+                conic-gradient(from 180deg at 50% 50%, transparent 0deg, rgba(168, 85, 247, 0.1) 60deg, transparent 120deg);
         }
         
         .brand-content {
@@ -82,15 +85,19 @@
         .brand-logo {
             width: 80px;
             height: 80px;
-            background: var(--gradient-neural);
-            border-radius: 24px;
+            background: linear-gradient(135deg, #8B45FF 0%, #3B82F6 50%, #A855F7 100%);
+            border-radius: 20px;
             display: flex;
             align-items: center;
             justify-content: center;
             margin: 0 auto var(--space-6);
-            box-shadow: var(--shadow-glow);
+            box-shadow: 
+                0 0 40px rgba(139, 69, 255, 0.6),
+                0 8px 32px rgba(0, 0, 0, 0.3),
+                inset 0 1px 0 rgba(255, 255, 255, 0.2);
             position: relative;
             overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.1);
         }
         
         .brand-logo::before {
@@ -158,12 +165,16 @@
         .brand-feature-icon {
             width: 48px;
             height: 48px;
-            background: var(--gradient-ai);
-            border-radius: var(--radius-md);
+            background: linear-gradient(135deg, #8B45FF 0%, #A855F7 100%);
+            border-radius: 12px;
             display: flex;
             align-items: center;
             justify-content: center;
             flex-shrink: 0;
+            box-shadow: 
+                0 4px 20px rgba(139, 69, 255, 0.3),
+                inset 0 1px 0 rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.1);
         }
         
         .brand-feature-icon svg {
@@ -189,7 +200,7 @@
         /* === RIGHT SIDE - AUTH FORM === */
         .auth-form-side {
             flex: 1;
-            background: var(--deep-space);
+            background: linear-gradient(135deg, #0F0B1F 0%, #1A0F2E 50%, #0F0B1F 100%);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -202,16 +213,44 @@
             position: absolute;
             top: 0;
             left: 0;
-            width: 1px;
+            width: 2px;
             height: 100%;
-            background: linear-gradient(180deg, transparent 0%, rgba(255, 255, 255, 0.1) 50%, transparent 100%);
+            background: linear-gradient(
+                180deg, 
+                transparent 0%, 
+                rgba(139, 69, 255, 0.3) 30%, 
+                rgba(59, 130, 246, 0.3) 70%, 
+                transparent 100%
+            );
+        }
+        
+        .auth-form-side::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            left: 0;
+            background: 
+                radial-gradient(circle at 80% 20%, rgba(139, 69, 255, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 20% 80%, rgba(59, 130, 246, 0.1) 0%, transparent 50%);
+            pointer-events: none;
         }
         
         .auth-form-container {
             width: 100%;
-            max-width: 400px;
+            max-width: 420px;
             position: relative;
-            z-index: 2;
+            z-index: 3;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            border-radius: 24px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: var(--space-8);
+            box-shadow: 
+                0 20px 40px rgba(0, 0, 0, 0.3),
+                0 0 80px rgba(139, 69, 255, 0.2),
+                inset 0 1px 0 rgba(255, 255, 255, 0.1);
         }
         
         .auth-header {
@@ -258,21 +297,26 @@
         .input {
             width: 100%;
             padding: var(--space-4);
-            background: rgba(255, 255, 255, 0.03);
-            backdrop-filter: blur(var(--blur-glass));
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: var(--radius-lg);
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 16px;
             color: var(--text-primary);
             font-size: 1rem;
             transition: all var(--transition-normal);
             min-height: 56px;
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1);
         }
         
         .input:focus {
             outline: none;
-            border-color: var(--neural-blue);
-            box-shadow: 0 0 20px rgba(0, 82, 255, 0.2), 0 0 0 1px var(--neural-blue);
-            background: rgba(255, 255, 255, 0.05);
+            border-color: #8B45FF;
+            box-shadow: 
+                0 0 30px rgba(139, 69, 255, 0.3), 
+                0 0 0 2px rgba(139, 69, 255, 0.2),
+                inset 0 1px 0 rgba(255, 255, 255, 0.2);
+            background: rgba(255, 255, 255, 0.12);
+            transform: translateY(-1px);
         }
         
         .input::placeholder {
@@ -298,10 +342,13 @@
         }
         
         .btn-primary {
-            background: var(--gradient-neural);
+            background: linear-gradient(135deg, #8B45FF 0%, #A855F7 50%, #3B82F6 100%);
             color: var(--pure-white);
-            box-shadow: var(--shadow-glow);
+            box-shadow: 
+                0 0 30px rgba(139, 69, 255, 0.5),
+                0 8px 32px rgba(139, 69, 255, 0.3);
             margin-bottom: var(--space-6);
+            border: 1px solid rgba(255, 255, 255, 0.1);
         }
         
         .btn-primary::before {
@@ -316,8 +363,10 @@
         }
         
         .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: var(--shadow-hover);
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: 
+                0 0 40px rgba(139, 69, 255, 0.7),
+                0 12px 40px rgba(139, 69, 255, 0.4);
         }
         
         .btn-primary:hover::before {
@@ -325,17 +374,23 @@
         }
         
         .btn-google {
-            background: rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(var(--blur-glass));
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
             color: var(--text-primary);
             margin-bottom: var(--space-8);
+            box-shadow: 
+                inset 0 1px 0 rgba(255, 255, 255, 0.1),
+                0 4px 20px rgba(0, 0, 0, 0.2);
         }
         
         .btn-google:hover {
-            background: rgba(255, 255, 255, 0.08);
-            border-color: rgba(255, 255, 255, 0.2);
-            transform: translateY(-1px);
+            background: rgba(255, 255, 255, 0.12);
+            border-color: rgba(255, 255, 255, 0.25);
+            transform: translateY(-2px);
+            box-shadow: 
+                inset 0 1px 0 rgba(255, 255, 255, 0.2),
+                0 8px 30px rgba(0, 0, 0, 0.3);
         }
         
         .auth-divider {
@@ -369,7 +424,7 @@
         .auth-toggle button {
             background: none;
             border: none;
-            color: var(--neural-blue);
+            color: #8B45FF;
             cursor: pointer;
             font-weight: 600;
             font-size: 0.875rem;
@@ -378,7 +433,8 @@
         }
         
         .auth-toggle button:hover {
-            color: var(--cyber-green);
+            color: #A855F7;
+            text-shadow: 0 0 10px rgba(168, 85, 247, 0.5);
         }
         
         .auth-footer {
@@ -422,9 +478,10 @@
             width: 48px;
             height: 48px;
             border: 3px solid rgba(255, 255, 255, 0.1);
-            border-top: 3px solid var(--neural-blue);
+            border-top: 3px solid #8B45FF;
             border-radius: 50%;
             animation: spin 1s linear infinite;
+            box-shadow: 0 0 20px rgba(139, 69, 255, 0.3);
         }
         
         .loading-text {
@@ -470,6 +527,10 @@
             .auth-form-side {
                 flex: none;
                 min-height: 60vh;
+                padding: var(--space-6);
+            }
+            
+            .auth-form-container {
                 padding: var(--space-6);
             }
             
@@ -735,10 +796,9 @@
 
                 // Redirect on success
                 if (result.data.session) {
-                    showSuccess('Successfully signed in!');
-                    setTimeout(() => {
-                        window.location.href = '/dashboard';
-                    }, 1000);
+                    showLoading('Redirecting to dashboard...');
+                    // Immediate redirect for faster UX
+                    window.location.href = '/dashboard';
                 }
 
             } catch (error) {
@@ -770,10 +830,9 @@
                 
                 if (event === 'SIGNED_IN' && session) {
                     console.log('User signed in, redirecting to dashboard');
-                    showSuccess('Successfully signed in!');
-                    setTimeout(() => {
-                        window.location.href = '/dashboard';
-                    }, 1000);
+                    showLoading('Signing you in...');
+                    // Immediate redirect - no delay needed
+                    window.location.href = '/dashboard';
                 }
                 
                 if (event === 'SIGNED_OUT') {
