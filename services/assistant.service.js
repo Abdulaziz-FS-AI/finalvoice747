@@ -60,17 +60,23 @@ class AssistantService {
                 };
             }
             
+            // CRITICAL DEBUG
+            console.log('🔍 CRITICAL DEBUG - Raw assistants data:', assistants);
+            console.log('🔍 CRITICAL DEBUG - User ID:', userId);
+            console.log('🔍 CRITICAL DEBUG - Profile:', profile);
+            
             const assistantCount = assistants ? assistants.length : 0;
             const maxAssistants = profile.is_demo_user ? 2 : 10; // Demo users get 2, others get 10
             
             const canCreate = assistantCount < maxAssistants;
             
-            console.log(`User ${userId} assistant limit check:`, {
+            console.log(`🔴 LIMIT CHECK RESULT for ${userId}:`, {
                 assistantCount,
                 maxAssistants,
                 canCreate,
                 isDemoUser: profile.is_demo_user,
-                demoExpired
+                demoExpired,
+                assistantsFound: assistants
             });
             
             return {
@@ -136,10 +142,15 @@ class AssistantService {
         try {
             // Check limits first
             const limits = await this.canCreateAssistant(userId);
+            console.log('🔵 LIMIT CHECK IN CREATE:', limits);
+            
             if (!limits.can_create_assistant) {
+                console.log('❌ CREATE BLOCKED BY LIMITS');
                 // Silent failure - return null
                 return null;
             }
+            
+            console.log('✅ LIMITS PASSED, PROCEEDING TO CREATE');
             
             // Build system prompt
             const systemPrompt = this.buildSystemPrompt(assistantData);
@@ -148,10 +159,15 @@ class AssistantService {
             const vapiPayload = this.buildVAPIPayload(assistantData, systemPrompt);
             
             // Create in VAPI first
+            console.log('🚀 CALLING VAPI CREATE...');
             const vapiAssistant = await vapiService.createAssistant(vapiPayload);
+            
             if (!vapiAssistant) {
+                console.error('❌ VAPI RETURNED NULL - API CALL FAILED');
                 throw new Error('Failed to create VAPI assistant');
             }
+            
+            console.log('✅ VAPI ASSISTANT CREATED:', vapiAssistant.id);
             
             // Store in database
             const { data, error } = await supabase
