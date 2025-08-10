@@ -153,10 +153,10 @@
         }
         
         .personality-option:has(input:checked) {
-            border-color: var(--cyber-green);
-            background: rgba(0, 255, 157, 0.1);
+            border-color: #00FF88;
+            background: rgba(0, 255, 136, 0.1);
             transform: translateY(-1px);
-            box-shadow: 0 4px 12px rgba(0, 255, 157, 0.2);
+            box-shadow: 0 4px 12px rgba(0, 255, 136, 0.2);
         }
         
         .personality-option:hover {
@@ -167,7 +167,7 @@
         }
         
         .personality-option input[type="checkbox"]:checked + label {
-            color: var(--cyber-green);
+            color: #00FF88;
             font-weight: 600;
         }
         
@@ -347,8 +347,8 @@
         
         .result.success {
             background: rgba(0, 255, 136, 0.1);
-            color: var(--cyber-green);
-            border: 1px solid var(--cyber-green);
+            color: #00FF88;
+            border: 1px solid #00FF88;
         }
         
         .result.error {
@@ -541,8 +541,8 @@
         /* Select dropdown visual feedback */
         select.input:focus,
         select.input:valid {
-            border-color: var(--cyber-green);
-            box-shadow: 0 0 0 2px rgba(0, 255, 157, 0.2);
+            border-color: #00FF88;
+            box-shadow: 0 0 0 2px rgba(0, 255, 136, 0.2);
         }
         
         select.input option {
@@ -835,12 +835,15 @@
                         
                         // Add change listener for visual feedback
                         voiceSelect.addEventListener('change', function() {
+                            console.log('🎵 Voice selected:', this.value);
                             if (this.value) {
-                                this.style.color = 'var(--cyber-green)';
+                                this.style.color = '#00FF88';
                                 this.style.fontWeight = '600';
+                                this.style.background = 'rgba(0, 255, 136, 0.1)';
                             } else {
                                 this.style.color = '';
                                 this.style.fontWeight = '';
+                                this.style.background = '';
                             }
                         });
                     } else {
@@ -891,12 +894,15 @@
                 
                 // Add change listener for visual feedback
                 evalSelect.addEventListener('change', function() {
+                    console.log('📊 Evaluation method selected:', this.value);
                     if (this.value) {
-                        this.style.color = 'var(--cyber-green)';
+                        this.style.color = '#00FF88';
                         this.style.fontWeight = '600';
+                        this.style.background = 'rgba(0, 255, 136, 0.1)';
                     } else {
                         this.style.color = '';
                         this.style.fontWeight = '';
+                        this.style.background = '';
                     }
                 });
                 
@@ -961,12 +967,15 @@
             const backgroundSelect = document.getElementById('background_sound');
             if (backgroundSelect) {
                 backgroundSelect.addEventListener('change', function() {
+                    console.log('🎧 Background sound selected:', this.value);
                     if (this.value) {
-                        this.style.color = 'var(--cyber-green)';
+                        this.style.color = '#00FF88';
                         this.style.fontWeight = '600';
+                        this.style.background = 'rgba(0, 255, 136, 0.1)';
                     } else {
                         this.style.color = '';
                         this.style.fontWeight = '';
+                        this.style.background = '';
                     }
                 });
                 console.log('✅ Background sound listener set up');
@@ -982,8 +991,12 @@
             
             if (!container) {
                 console.error('❌ Structured questions container not found');
+                alert('Error: Questions container not found! Please refresh the page.');
                 return;
             }
+            
+            console.log('📝 Question count:', questionCount);
+            console.log('📦 Container found:', container);
             
             const questionDiv = document.createElement('div');
             questionDiv.className = 'question-item';
@@ -1025,6 +1038,7 @@
             `;
             
             container.appendChild(questionDiv);
+            console.log('✅ Question added successfully! Total questions:', questionCount);
         }
         
         function removeQuestion(button) {
