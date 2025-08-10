@@ -217,12 +217,80 @@ try {
 
 console.log(`📊 Loaded ${apiRoutesLoaded}/6 API route modules`);
 
+// VAPI Test endpoint for production debugging
+app.get('/api/test/vapi', async (req, res) => {
+    try {
+        const vapiService = require('./services/vapi.service');
+        
+        // Simple test payload
+        const testPayload = {
+            name: 'Test Assistant',
+            model: {
+                provider: 'openai',
+                model: 'gpt-4o-mini',
+                messages: [{ role: 'system', content: 'You are a test assistant.' }],
+                maxTokens: 100,
+                temperature: 0.7
+            },
+            voice: {
+                provider: 'vapi',
+                voiceId: 'Elliot'
+            },
+            transcriber: {
+                provider: 'deepgram',
+                model: 'nova-3-general',
+                language: 'en'
+            },
+            firstMessage: 'Hello, this is a test.',
+            maxDurationSeconds: 60
+        };
+        
+        console.log('🧪 Testing VAPI connection...');
+        const result = await vapiService.createAssistant(testPayload);
+        
+        if (result) {
+            // Clean up test assistant
+            if (result.id) {
+                await vapiService.deleteAssistant(result.id);
+            }
+            
+            res.json({
+                success: true,
+                message: 'VAPI connection test successful',
+                result: 'Assistant created and deleted successfully'
+            });
+        } else {
+            res.json({
+                success: false,
+                message: 'VAPI connection test failed',
+                error: 'Assistant creation returned null'
+            });
+        }
+    } catch (error) {
+        console.error('❌ VAPI test error:', error);
+        res.status(500).json({
+            success: false,
+            message: 'VAPI test failed with exception',
+            error: error.message
+        });
+    }
+});
+
 // Health check
 app.get('/health', (req, res) => {
+    const vapiConfigured = !!(process.env.VAPI_API_TOKEN && process.env.VAPI_BASE_URL);
+    const supabaseConfigured = !!(process.env.SUPABASE_URL && process.env.SUPABASE_ANON_KEY);
+    
     res.json({ 
         status: 'OK', 
         timestamp: new Date().toISOString(),
-        apiRoutes: apiRoutesLoaded 
+        apiRoutes: apiRoutesLoaded,
+        environment: {
+            node_env: process.env.NODE_ENV || 'development',
+            vapi_configured: vapiConfigured,
+            supabase_configured: supabaseConfigured,
+            port: process.env.PORT || 8080
+        }
     });
 });
 
