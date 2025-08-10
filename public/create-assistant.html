@@ -612,7 +612,14 @@
             console.log('🚀 Create Assistant page loading...');
             
             try {
-                // Initialize Supabase authentication
+                // Always load configuration first (this populates dropdowns)
+                console.log('🎛️ Loading configuration...');
+                await loadConfig();
+                console.log('🎯 Setting up event listeners...');
+                setupEventListeners();
+                
+                // Then handle auth
+                console.log('🔐 Initializing authentication...');
                 await initSupabaseAuth();
                 
                 console.log('🔐 Checking authentication...');
@@ -628,15 +635,19 @@
                 // Update user email in nav
                 document.getElementById('userEmail').textContent = currentUser.email;
                 
-                console.log('🎛️ Loading configuration...');
-                await loadConfig();
-                console.log('🎯 Setting up event listeners...');
-                setupEventListeners();
                 console.log('✅ Create Assistant page fully loaded');
                 
             } catch (error) {
                 console.error('❌ Initialization error:', error);
                 showResult('error', 'Failed to load page: ' + error.message);
+                
+                // Still try to load config even if auth fails
+                try {
+                    await loadConfig();
+                    setupEventListeners();
+                } catch (configError) {
+                    console.error('❌ Config loading also failed:', configError);
+                }
             }
         });
         
@@ -683,28 +694,40 @@
         
         async function loadConfig() {
             try {
-                // Load voices from API endpoint
-                const voiceResponse = await fetch('/api/config/voices');
-                const voiceData = await voiceResponse.json();
+                console.log('📢 Starting loadConfig function...');
                 
                 // Load voice options
                 const voiceSelect = document.getElementById('voice_id');
-                voiceSelect.innerHTML = '<option value="">Select a voice...</option>';
-                if (voiceData.success) {
-                    voiceData.data.forEach(voice => {
-                        const option = document.createElement('option');
-                        option.value = voice.id;
-                        option.textContent = `${voice.name} - ${voice.description}`;
-                        voiceSelect.appendChild(option);
-                    });
-                } else {
-                    voiceSelect.innerHTML = '<option value="">Error loading voices</option>';
+                console.log('🎤 Loading voices...');
+                
+                try {
+                    const voiceResponse = await fetch('/api/config/voices');
+                    const voiceData = await voiceResponse.json();
+                    
+                    voiceSelect.innerHTML = '<option value="">Select a voice...</option>';
+                    if (voiceData.success && voiceData.data) {
+                        console.log(`✅ Loaded ${voiceData.data.length} voices`);
+                        voiceData.data.forEach(voice => {
+                            const option = document.createElement('option');
+                            option.value = voice.id;
+                            option.textContent = `${voice.name} - ${voice.description}`;
+                            voiceSelect.appendChild(option);
+                        });
+                    } else {
+                        console.warn('⚠️ Voice API returned unsuccessful response');
+                        voiceSelect.innerHTML = '<option value="">Error loading voices</option>';
+                    }
+                } catch (voiceError) {
+                    console.error('❌ Voice loading failed:', voiceError);
+                    voiceSelect.innerHTML = '<option value="">Select a voice...</option>';
                 }
                 
                 // Load personality traits
+                console.log('🧠 Loading personality traits...');
                 const personalityGrid = document.getElementById('personalityGrid');
                 const traits = ['Professional', 'Friendly', 'Energetic', 'Calming', 'Confident', 'Empathetic', 'Witty', 'Patient', 'Knowledgeable', 'Supportive'];
                 
+                personalityGrid.innerHTML = ''; // Clear existing content
                 traits.forEach(trait => {
                     const div = document.createElement('div');
                     div.className = 'personality-option';
@@ -714,8 +737,10 @@
                     `;
                     personalityGrid.appendChild(div);
                 });
+                console.log(`✅ Loaded ${traits.length} personality traits`);
                 
                 // Load evaluation methods
+                console.log('📊 Loading evaluation methods...');
                 const evalSelect = document.getElementById('evaluation_method');
                 const evaluationMethods = [
                     { value: "NumericScale", label: "Numeric Scale (1-10)" },
@@ -732,6 +757,7 @@
                     option.textContent = method.label;
                     evalSelect.appendChild(option);
                 });
+                console.log(`✅ Loaded ${evaluationMethods.length} evaluation methods`);
                 
             } catch (error) {
                 console.error('Error loading config:', error);
@@ -740,23 +766,44 @@
         }
         
         function setupEventListeners() {
+            console.log('🎯 Setting up event listeners...');
+            
             // Duration slider
             const durationSlider = document.getElementById('max_call_duration');
             const durationValue = document.getElementById('durationValue');
             
-            durationSlider.addEventListener('input', function() {
-                const minutes = Math.floor(this.value / 60);
-                const seconds = this.value % 60;
-                durationValue.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
-            });
+            if (durationSlider && durationValue) {
+                durationSlider.addEventListener('input', function() {
+                    const minutes = Math.floor(this.value / 60);
+                    const seconds = this.value % 60;
+                    durationValue.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+                });
+                console.log('✅ Duration slider listener set up');
+            } else {
+                console.error('❌ Duration slider elements not found');
+            }
             
             // Form submission
-            document.getElementById('assistantForm').addEventListener('submit', handleFormSubmit);
+            const form = document.getElementById('assistantForm');
+            if (form) {
+                form.addEventListener('submit', handleFormSubmit);
+                console.log('✅ Form submit listener set up');
+            } else {
+                console.error('❌ Assistant form not found');
+            }
+            
+            console.log('✅ All event listeners configured');
         }
         
         function addStructuredQuestion() {
+            console.log('➕ Adding structured question...');
             questionCount++;
             const container = document.getElementById('structuredQuestions');
+            
+            if (!container) {
+                console.error('❌ Structured questions container not found');
+                return;
+            }
             
             const questionDiv = document.createElement('div');
             questionDiv.className = 'question-item';
