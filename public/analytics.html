@@ -5,13 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Analytics Dashboard - Voice Matrix AI</title>
     
-    <!-- Fonts -->
+    <!-- Modern Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     
     <!-- Design System -->
     <link rel="stylesheet" href="/css/design-system.css">
+    <link rel="stylesheet" href="/css/modern-theme.css">
     
     <!-- Theme Management -->
     <script src="/js/theme.js"></script>
@@ -262,19 +263,28 @@
     </style>
 </head>
 <body>
-    <!-- Navigation -->
-    <nav class="nav">
-        <div class="nav-content">
-            <a href="/dashboard" class="nav-brand">Voice Matrix AI</a>
-            <div class="nav-tabs">
-                <a href="/dashboard" class="nav-tab">Dashboard</a>
-                <a href="/assistants" class="nav-tab">Assistants</a>
-                <a href="/phone-numbers" class="nav-tab">Phone Numbers</a>
-                <a href="/analytics" class="nav-tab active">Analytics</a>
-            </div>
-            <div class="nav-user">
-                <span class="nav-user-email" id="userEmail">Loading...</span>
-                <button class="btn btn-danger btn-sm" onclick="signOut()">Sign Out</button>
+    <!-- Modern Navigation -->
+    <nav class="nav" id="navbar">
+        <div class="container">
+            <div class="nav-content">
+                <a href="/dashboard" class="nav-brand">
+                    <div class="nav-logo">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                        </svg>
+                    </div>
+                    Voice Matrix AI
+                </a>
+                <div class="nav-tabs">
+                    <a href="/dashboard" class="nav-tab">Dashboard</a>
+                    <a href="/assistants" class="nav-tab">Assistants</a>
+                    <a href="/phone-numbers" class="nav-tab">Phone Numbers</a>
+                    <a href="/analytics" class="nav-tab active">Analytics</a>
+                </div>
+                <div class="nav-user">
+                    <span class="nav-user-email" id="userEmail">Loading...</span>
+                    <button class="btn btn-danger btn-sm" onclick="signOut()">Sign Out</button>
+                </div>
             </div>
         </div>
     </nav>
