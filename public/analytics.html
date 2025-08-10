@@ -21,30 +21,69 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@3.0.0/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
     <style>
+        /* === ANALYTICS PAGE MODERN THEME === */
+        body {
+            padding-top: 80px;
+            min-height: 100vh;
+            background: var(--deep-space);
+        }
+        
         .page-header {
-            padding: var(--space-8) 0;
-            background: var(--bg-primary);
-            border-bottom: 1px solid var(--border-default);
+            padding: var(--space-16) 0 var(--space-12) 0;
+            background: linear-gradient(135deg, var(--deep-space) 0%, var(--neural-gray) 50%, var(--deep-space) 100%);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .page-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: var(--gradient-glow);
+            opacity: 0.4;
+        }
+        
+        .page-header .container {
+            position: relative;
+            z-index: 2;
+            text-align: center;
         }
         
         .page-title {
-            margin-bottom: var(--space-2);
+            font-family: var(--font-display);
+            font-size: var(--text-xl);
+            font-weight: 700;
+            line-height: var(--line-tight);
+            margin-bottom: var(--space-4);
+            background: linear-gradient(135deg, var(--text-primary) 0%, rgba(255, 255, 255, 0.8) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
         }
         
         .page-subtitle {
+            font-size: var(--text-lg);
             color: var(--text-secondary);
+            line-height: var(--line-relaxed);
+            max-width: 600px;
+            margin: 0 auto;
         }
         
         .demo-warning {
-            background: #FEF3C7;
-            border: 1px solid #FCD34D;
-            color: #92400E;
+            background: rgba(255, 193, 7, 0.1);
+            border: 1px solid #ffc107;
+            color: #ffb300;
             padding: var(--space-4);
             border-radius: var(--radius-md);
             margin-bottom: var(--space-6);
             display: none;
             align-items: center;
             gap: var(--space-3);
+            backdrop-filter: blur(var(--blur-glass));
         }
         
         .demo-warning.show {
@@ -65,14 +104,15 @@
         }
         
         .metric-card {
-            background: var(--bg-primary);
-            border-radius: var(--radius-lg);
+            background: var(--gradient-card);
+            backdrop-filter: blur(var(--blur-glass));
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: var(--radius-xl);
             padding: var(--space-6);
-            box-shadow: var(--shadow-sm);
-            border: 1px solid var(--border-default);
             transition: all var(--transition-normal);
             position: relative;
             overflow: hidden;
+            box-shadow: var(--shadow-card);
         }
         
         .metric-card::before {
@@ -82,38 +122,55 @@
             left: 0;
             width: 4px;
             height: 100%;
-            background: var(--color-primary);
+            background: var(--gradient-neural);
             border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
         }
         
-        .metric-card.success::before { background: var(--color-success); }
-        .metric-card.warning::before { background: var(--color-warning); }
-        .metric-card.info::before { background: var(--color-info); }
-        .metric-card.purple::before { background: var(--color-purple); }
+        .metric-card.success::before { background: var(--gradient-ai); }
+        .metric-card.warning::before { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); }
+        .metric-card.info::before { background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); }
+        .metric-card.purple::before { background: var(--gradient-neural); }
         
         .metric-card:hover {
-            box-shadow: var(--shadow-md);
-            transform: translateY(-2px);
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-hover);
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+        
+        .metric-card:hover::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, rgba(0, 82, 255, 0.05) 0%, transparent 50%);
+            opacity: 1;
         }
         
         .metric-label {
-            color: var(--text-secondary);
+            color: var(--text-muted);
             font-size: 14px;
-            font-weight: var(--font-weight-medium);
+            font-weight: 500;
             margin-bottom: var(--space-2);
+            position: relative;
+            z-index: 1;
         }
         
         .metric-value {
-            font-size: 32px;
-            font-weight: var(--font-weight-bold);
+            font-family: var(--font-display);
+            font-size: clamp(1.75rem, 4vw, 2.25rem);
+            font-weight: 700;
             color: var(--text-primary);
             line-height: 1.1;
+            position: relative;
+            z-index: 1;
         }
         
         .metric-unit {
             font-size: 16px;
             color: var(--text-secondary);
-            font-weight: var(--font-weight-normal);
+            font-weight: 400;
             margin-left: var(--space-1);
         }
         
@@ -125,18 +182,41 @@
         }
         
         .chart-card {
-            background: var(--bg-primary);
-            border-radius: var(--radius-lg);
+            background: var(--gradient-card);
+            backdrop-filter: blur(var(--blur-glass));
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: var(--radius-xl);
             padding: var(--space-6);
-            box-shadow: var(--shadow-sm);
-            border: 1px solid var(--border-default);
+            transition: all var(--transition-normal);
+            position: relative;
+            overflow: hidden;
+            box-shadow: var(--shadow-card);
+        }
+        
+        .chart-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, rgba(0, 82, 255, 0.05) 0%, transparent 50%);
+            opacity: 0;
+            transition: opacity var(--transition-normal);
+        }
+        
+        .chart-card:hover::before {
+            opacity: 1;
         }
         
         .chart-card h3 {
             margin: 0 0 var(--space-5) 0;
-            font-size: 18px;
-            font-weight: var(--font-weight-semibold);
+            font-family: var(--font-display);
+            font-size: 1.125rem;
+            font-weight: 600;
             color: var(--text-primary);
+            position: relative;
+            z-index: 1;
         }
         
         .chart-container {
@@ -145,11 +225,15 @@
         }
         
         .call-history-section {
-            background: var(--bg-primary);
-            border-radius: var(--radius-lg);
+            background: var(--gradient-card);
+            backdrop-filter: blur(var(--blur-glass));
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: var(--radius-xl);
             padding: var(--space-6);
-            box-shadow: var(--shadow-sm);
-            border: 1px solid var(--border-default);
+            transition: all var(--transition-normal);
+            position: relative;
+            overflow: hidden;
+            box-shadow: var(--shadow-card);
         }
         
         .section-header {
@@ -161,8 +245,9 @@
         
         .section-header h3 {
             margin: 0;
-            font-size: 20px;
-            font-weight: var(--font-weight-semibold);
+            font-family: var(--font-display);
+            font-size: 1.25rem;
+            font-weight: 600;
             color: var(--text-primary);
         }
         
@@ -174,28 +259,118 @@
         .call-table th {
             text-align: left;
             padding: var(--space-3);
-            background: var(--bg-secondary);
-            font-weight: var(--font-weight-semibold);
-            color: var(--text-primary);
-            font-size: 14px;
-            border-bottom: 1px solid var(--border-default);
+            background: var(--glass-white);
+            font-weight: 600;
+            color: var(--text-muted);
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
         }
         
         .call-table td {
             padding: var(--space-3);
-            border-bottom: 1px solid var(--border-default);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
             font-size: 14px;
-            color: var(--text-secondary);
+            color: var(--text-primary);
         }
         
         .call-table tr:hover {
-            background: var(--bg-hover);
+            background: var(--glass-white);
+            backdrop-filter: blur(var(--blur-glass));
         }
         
         .empty-state {
             text-align: center;
             padding: var(--space-12) var(--space-4);
             color: var(--text-secondary);
+        }
+
+        /* === ADDITIONAL MODERN STYLES === */
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 var(--space-6);
+        }
+        
+        .btn {
+            padding: var(--space-3) var(--space-6);
+            border-radius: var(--radius-md);
+            font-weight: 600;
+            font-size: var(--text-sm);
+            cursor: pointer;
+            transition: all var(--transition-normal);
+            border: none;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: var(--space-2);
+            font-family: var(--font-body);
+        }
+        
+        .btn-primary {
+            background: var(--gradient-neural);
+            color: var(--pure-white);
+            box-shadow: var(--shadow-glow);
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-hover);
+        }
+        
+        .btn-secondary {
+            background: var(--glass-white);
+            backdrop-filter: blur(var(--blur-glass));
+            color: var(--text-primary);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateY(-1px);
+        }
+        
+        .loading {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: var(--space-8);
+            gap: var(--space-3);
+            color: var(--text-secondary);
+        }
+        
+        .loading-spinner {
+            width: 24px;
+            height: 24px;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-top: 2px solid var(--neural-blue);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        /* === RESPONSIVE DESIGN === */
+        @media (max-width: 768px) {
+            .charts-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .metrics-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .page-header {
+                padding: var(--space-12) 0 var(--space-8) 0;
+            }
+            
+            .container {
+                padding: 0 var(--space-4);
+            }
         }
         
         .empty-state svg {
@@ -298,8 +473,8 @@
     </section>
 
     <!-- Main Content -->
-    <main class="section">
-        <div class="container">
+    <main style="padding: var(--space-8) 0 var(--space-12) 0;">
+        <div class="container" style="max-width: 1400px; margin: 0 auto; padding: 0 var(--space-6);">
             <!-- Demo Warning -->
             <div class="demo-warning" id="demoWarning">
                 <svg class="demo-warning-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
