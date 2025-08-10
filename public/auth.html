@@ -78,8 +78,8 @@
             position: relative;
             z-index: 2;
             text-align: center;
-            max-width: 500px;
-            padding: var(--space-8);
+            max-width: 420px;
+            padding: var(--space-6);
         }
         
         .brand-logo {
@@ -120,10 +120,10 @@
         
         .brand-title {
             font-family: var(--font-display);
-            font-size: clamp(2rem, 5vw, 3.5rem);
+            font-size: clamp(1.8rem, 4.5vw, 2.8rem);
             font-weight: 800;
             line-height: 1.1;
-            margin-bottom: var(--space-4);
+            margin-bottom: var(--space-3);
             background: linear-gradient(135deg, var(--text-primary) 0%, rgba(255, 255, 255, 0.8) 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
@@ -132,30 +132,30 @@
         
         .brand-tagline {
             font-family: var(--font-body);
-            font-size: clamp(1rem, 2.5vw, 1.25rem);
+            font-size: clamp(0.9rem, 2.2vw, 1.1rem);
             color: rgba(255, 255, 255, 0.85);
             font-weight: 400;
-            line-height: 1.6;
-            margin-bottom: var(--space-8);
+            line-height: 1.4;
+            margin-bottom: var(--space-6);
             text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
         }
         
         .brand-features {
             display: flex;
             flex-direction: column;
-            gap: var(--space-4);
+            gap: var(--space-2);
             text-align: left;
         }
         
         .brand-feature {
             display: flex;
             align-items: center;
-            gap: var(--space-3);
-            padding: var(--space-3);
+            gap: var(--space-2);
+            padding: var(--space-2);
             background: rgba(255, 255, 255, 0.03);
             backdrop-filter: blur(10px);
             border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: var(--radius-lg);
+            border-radius: var(--radius-md);
             transition: all var(--transition-normal);
         }
         
@@ -166,42 +166,42 @@
         }
         
         .brand-feature-icon {
-            width: 48px;
-            height: 48px;
+            width: 36px;
+            height: 36px;
             background: linear-gradient(135deg, #8B45FF 0%, #A855F7 100%);
-            border-radius: 12px;
+            border-radius: 8px;
             display: flex;
             align-items: center;
             justify-content: center;
             flex-shrink: 0;
             box-shadow: 
-                0 4px 20px rgba(139, 69, 255, 0.3),
+                0 2px 12px rgba(139, 69, 255, 0.3),
                 inset 0 1px 0 rgba(255, 255, 255, 0.2);
             border: 1px solid rgba(255, 255, 255, 0.1);
         }
         
         .brand-feature-icon svg {
-            width: 24px;
-            height: 24px;
+            width: 18px;
+            height: 18px;
             color: white;
         }
         
         .brand-feature-content h4 {
             font-family: var(--font-display);
-            font-size: 1.1rem;
+            font-size: 0.95rem;
             font-weight: 600;
             color: #FFFFFF;
-            margin-bottom: var(--space-1);
+            margin-bottom: 2px;
             text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
         }
         
         .brand-feature-content p {
             font-family: var(--font-body);
-            font-size: 0.875rem;
+            font-size: 0.8rem;
             font-weight: 400;
             color: rgba(255, 255, 255, 0.75);
             margin: 0;
-            line-height: 1.4;
+            line-height: 1.3;
         }
         
         /* === RIGHT SIDE - AUTH FORM === */
@@ -604,7 +604,7 @@
                 </div>
                 
                 <h1 class="brand-title">Voice Matrix AI</h1>
-                <p class="brand-tagline">Transform every missed call into revenue with intelligent AI agents that work 24/7</p>
+                <p class="brand-tagline">Transform missed calls into revenue with 24/7 AI agents</p>
                 
                 <div class="brand-features">
                     <div class="brand-feature">
@@ -615,19 +615,7 @@
                         </div>
                         <div class="brand-feature-content">
                             <h4>Never Miss a Call</h4>
-                            <p>24/7 AI agents answer instantly with human-like conversations</p>
-                        </div>
-                    </div>
-                    
-                    <div class="brand-feature">
-                        <div class="brand-feature-icon">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                            </svg>
-                        </div>
-                        <div class="brand-feature-content">
-                            <h4>Smart Lead Qualification</h4>
-                            <p>Automatically qualify prospects and route hot leads to your team</p>
+                            <p>24/7 AI agents answer instantly</p>
                         </div>
                     </div>
                     
@@ -639,7 +627,7 @@
                         </div>
                         <div class="brand-feature-content">
                             <h4>300% More Revenue</h4>
-                            <p>Convert missed calls into customers with proven results</p>
+                            <p>Convert missed calls into customers</p>
                         </div>
                     </div>
                 </div>
