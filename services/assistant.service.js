@@ -414,84 +414,32 @@ QUESTION STRATEGY FOR SHORT CALLS:
     
     // Build VAPI payload
     buildVAPIPayload(formData, systemPrompt) {
+        // Start with minimal working payload
         const payload = {
-            name: formData.name,
+            name: formData.name || "Voice Assistant",
             model: {
                 provider: "openai",
                 model: "gpt-4o-mini",
                 messages: [
                     {
                         role: "system",
-                        content: systemPrompt
+                        content: systemPrompt || "You are a helpful assistant."
                     }
-                ],
-                maxTokens: 500,
-                temperature: 0.7
+                ]
             },
             voice: {
-                provider: "vapi",
-                voiceId: formData.voice_id || "Elliot"
+                provider: "playht",
+                voiceId: "jennifer"
             },
-            transcriber: {
-                provider: "deepgram",
-                model: "nova-3-general",
-                language: "en"
-            },
-            firstMessage: formData.first_message,
-            firstMessageMode: "assistant-speaks-first",
-            maxDurationSeconds: formData.max_call_duration || 300,
-            backgroundSound: formData.background_sound || "office",
-            recordingEnabled: true,
-            fillersEnabled: true,
-            endCallFunctionEnabled: false,
-            dialKeypadFunctionEnabled: false,
-            silenceTimeoutSeconds: 30,
-            responseDelaySeconds: 0.4,
-            endCallMessage: "Thank you for calling! Have a great day!"
+            firstMessage: formData.first_message || "Hello! How can I help you today?"
         };
 
-        // Add analysis plan if needed
-        const structuredDataSchema = this.buildStructuredDataSchema(formData.structured_questions);
-        if (structuredDataSchema || formData.evaluation_method !== 'NoEvaluation') {
-            payload.analysisPlan = {
-                minMessagesThreshold: 2,
-                summaryPlan: {
-                    enabled: true,
-                    timeoutSeconds: 30
-                }
-            };
-
-            if (structuredDataSchema) {
-                payload.analysisPlan.structuredDataPlan = {
-                    enabled: true,
-                    schema: structuredDataSchema,
-                    timeoutSeconds: 30
-                };
-            }
-
-            if (formData.evaluation_method && formData.evaluation_method !== 'NoEvaluation') {
-                payload.analysisPlan.successEvaluationPlan = {
-                    rubric: formData.evaluation_method,
-                    enabled: true,
-                    timeoutSeconds: 30
-                };
-            }
+        // Add optional fields only if they have valid values
+        if (formData.max_call_duration && formData.max_call_duration > 0) {
+            payload.maxDurationSeconds = parseInt(formData.max_call_duration);
         }
 
-        // Add Make.com webhook configuration for call events
-        if (process.env.MAKE_WEBHOOK_URL) {
-            payload.server = {
-                url: process.env.MAKE_WEBHOOK_URL,
-                secret: process.env.MAKE_WEBHOOK_SECRET,
-                headers: {
-                    "Content-Type": "application/json",
-                    "x-make-apikey": process.env.MAKE_WEBHOOK_SECRET
-                }
-            };
-            payload.serverMessages = ["end-of-call-report"];
-            payload.clientMessages = ["transcript"];
-        }
-
+        console.log('🔧 VAPI Payload built:', JSON.stringify(payload, null, 2));
         return payload;
     }
 }
