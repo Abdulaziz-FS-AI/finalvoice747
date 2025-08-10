@@ -61,7 +61,7 @@ class AssistantService {
             }
             
             const assistantCount = assistants ? assistants.length : 0;
-            const maxAssistants = profile.is_demo_user ? 1 : 10; // Demo users get 1, others get 10
+            const maxAssistants = profile.is_demo_user ? 2 : 10; // Demo users get 2, others get 10
             
             const canCreate = assistantCount < maxAssistants;
             

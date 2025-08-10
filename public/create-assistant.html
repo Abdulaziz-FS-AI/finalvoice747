@@ -648,6 +648,7 @@
                         <select id="voice_id" name="voice_id" class="input select">
                             <option value="">Loading voices...</option>
                         </select>
+                        <button type="button" onclick="testVoiceSelection()" style="margin-top: 8px; padding: 4px 8px; background: #ff0000; color: white; border: none; border-radius: 4px;">TEST VOICE SELECTION</button>
                     </div>
                     
                     <div class="input-group">
@@ -698,6 +699,7 @@
                             <!-- Questions added dynamically -->
                         </div>
                         <button type="button" class="btn btn-secondary" onclick="addStructuredQuestion()" style="background: #00FF88; color: #000; font-weight: 600;">+ Add Question</button>
+                        <button type="button" onclick="testAddQuestion()" style="margin-left: 8px; padding: 4px 8px; background: #ff0000; color: white; border: none; border-radius: 4px;">TEST ADD</button>
                         <small style="color: #888; display: block; margin-top: 8px;">Click to add a custom question for data collection</small>
                     </div>
                     
@@ -730,6 +732,13 @@
         // Initialize page
         document.addEventListener('DOMContentLoaded', async function() {
             console.log('🚀 Create Assistant page loading...');
+            console.log('🔍 DEBUGGING MODE ACTIVATED');
+            
+            // TEST: Check if elements exist
+            console.log('🔍 Voice select element:', document.getElementById('voice_id'));
+            console.log('🔍 Eval select element:', document.getElementById('evaluation_method'));
+            console.log('🔍 Background select element:', document.getElementById('background_sound'));
+            console.log('🔍 Questions container:', document.getElementById('structuredQuestions'));
             
             try {
                 // Always load configuration first (this populates dropdowns)
@@ -1083,6 +1092,44 @@
         
         function removeQuestion(button) {
             button.closest('.question-item').remove();
+        }
+        
+        // TEST FUNCTION - To manually debug voice selection
+        function testVoiceSelection() {
+            console.log('🔴 TEST: Manual voice selection test');
+            const voiceSelect = document.getElementById('voice_id');
+            console.log('🔴 Voice element:', voiceSelect);
+            console.log('🔴 Voice value:', voiceSelect?.value);
+            console.log('🔴 Voice options:', voiceSelect?.options.length);
+            
+            if (voiceSelect) {
+                // Manually set a value and trigger events
+                voiceSelect.value = 'Elliot';
+                console.log('🔴 Set value to Elliot');
+                
+                // Manually trigger styling
+                voiceSelect.style.cssText = 'color: #00FF88 !important; font-weight: 600 !important; background: rgba(0, 255, 136, 0.1) !important; border-color: #00FF88 !important;';
+                console.log('🔴 Applied styling manually');
+                
+                // Trigger change event
+                voiceSelect.dispatchEvent(new Event('change'));
+                console.log('🔴 Dispatched change event');
+            } else {
+                console.error('🔴 Voice select element not found!');
+            }
+        }
+        
+        // TEST FUNCTION - To manually debug add questions
+        function testAddQuestion() {
+            console.log('🔴 TEST: Manual add question test');
+            console.log('🔴 Question count before:', questionCount);
+            
+            try {
+                addStructuredQuestion();
+                console.log('🔴 addStructuredQuestion() called successfully');
+            } catch (error) {
+                console.error('🔴 Error calling addStructuredQuestion:', error);
+            }
         }
         
         // Handle form submission
