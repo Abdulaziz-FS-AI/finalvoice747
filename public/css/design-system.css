@@ -348,6 +348,8 @@ body {
   background-size: 16px 12px;
   padding-right: var(--space-10);
   cursor: pointer;
+  color: var(--text-primary);
+  font-size: 16px;
 }
 
 .select:focus {
@@ -374,20 +376,29 @@ body {
   color: white;
 }
 
-/* Selected state styling */
+/* Selected state styling - ensure text shows properly */
 .select.selected {
   color: #00FF88 !important;
   font-weight: 600 !important;
-  background-color: rgba(0, 255, 136, 0.1) !important;
+  background: rgba(0, 255, 136, 0.1) url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%2300FF88' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m6 8 4 4 4-4'/%3e%3c/svg%3e") no-repeat right var(--space-3) center !important;
+  background-size: 16px 12px !important;
   border-color: #00FF88 !important;
-  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%2300FF88' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m6 8 4 4 4-4'/%3e%3c/svg%3e") !important;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
 }
 
-/* Ensure selected text is visible */
-.select.selected option:checked,
-.select.selected option[selected] {
-  color: #00FF88 !important;
-  background-color: rgba(0, 255, 136, 0.2) !important;
+/* Dropdown options styling */
+.select option {
+  background-color: var(--bg-primary) !important;
+  color: var(--text-primary) !important;
+  padding: var(--space-2) !important;
+}
+
+.select option:checked,
+.select option:hover {
+  background-color: var(--color-primary) !important;
+  color: white !important;
 }
 
 /* Navigation */

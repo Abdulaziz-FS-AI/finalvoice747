@@ -1107,15 +1107,23 @@
             console.log('🔴 Voice element:', voiceSelect);
             console.log('🔴 Voice value:', voiceSelect?.value);
             console.log('🔴 Voice options:', voiceSelect?.options.length);
+            console.log('🔴 Selected index:', voiceSelect?.selectedIndex);
+            console.log('🔴 Selected option text:', voiceSelect?.options[voiceSelect?.selectedIndex]?.text);
             
             if (voiceSelect) {
+                // List all options
+                for (let i = 0; i < voiceSelect.options.length; i++) {
+                    console.log(`🔴 Option ${i}:`, voiceSelect.options[i].value, '-', voiceSelect.options[i].text);
+                }
+                
                 // Manually set a value and trigger events
                 voiceSelect.value = 'Elliot';
                 console.log('🔴 Set value to Elliot');
+                console.log('🔴 New selected option text:', voiceSelect.options[voiceSelect.selectedIndex]?.text);
                 
-                // Manually trigger styling
-                voiceSelect.style.cssText = 'color: #00FF88 !important; font-weight: 600 !important; background: rgba(0, 255, 136, 0.1) !important; border-color: #00FF88 !important;';
-                console.log('🔴 Applied styling manually');
+                // Add selected class instead of inline styles
+                voiceSelect.classList.add('selected');
+                console.log('🔴 Added selected class');
                 
                 // Trigger change event
                 voiceSelect.dispatchEvent(new Event('change'));
