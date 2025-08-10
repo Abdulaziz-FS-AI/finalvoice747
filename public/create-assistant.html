@@ -18,26 +18,80 @@
     <script src="/js/theme.js"></script>
     
     <style>
+        /* === PAGE STYLES USING MODERN THEME === */
+        body {
+            padding-top: 80px;
+            min-height: 100vh;
+            background: var(--deep-space);
+        }
+        
         .page-header {
             padding: var(--space-8) 0;
-            background: var(--bg-primary);
-            border-bottom: 1px solid var(--border-default);
+            background: linear-gradient(135deg, var(--deep-space) 0%, var(--neural-gray) 50%, var(--deep-space) 100%);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .page-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: var(--gradient-glow);
+            opacity: 0.3;
+        }
+        
+        .page-header .container {
+            position: relative;
+            z-index: 2;
         }
         
         .page-title {
+            font-family: var(--font-display);
+            font-size: clamp(2rem, 4vw, 3rem);
+            font-weight: 700;
             margin-bottom: var(--space-2);
+            background: linear-gradient(135deg, var(--text-primary) 0%, rgba(255, 255, 255, 0.8) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
         }
         
         .page-subtitle {
             color: var(--text-secondary);
+            font-size: 1.125rem;
+            line-height: 1.6;
         }
         
         .form-section {
-            background: var(--bg-primary);
-            border: 1px solid var(--border-default);
-            border-radius: var(--radius-lg);
+            background: var(--gradient-card);
+            backdrop-filter: blur(var(--blur-glass));
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: var(--radius-xl);
             padding: var(--space-8);
             margin-bottom: var(--space-6);
+            transition: all var(--transition-normal);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .form-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, rgba(0, 82, 255, 0.05) 0%, transparent 50%);
+            opacity: 0;
+            transition: opacity var(--transition-normal);
+        }
+        
+        .form-section:hover::before {
+            opacity: 1;
         }
         
         .section-header {
@@ -48,22 +102,28 @@
         }
         
         .section-number {
-            background: var(--color-primary);
-            color: white;
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
+            width: 48px;
+            height: 48px;
+            background: var(--gradient-neural);
+            border-radius: var(--radius-lg);
             display: flex;
             align-items: center;
             justify-content: center;
-            font-weight: var(--font-weight-semibold);
-            font-size: 14px;
+            color: var(--pure-white);
+            font-weight: 700;
+            font-size: var(--text-lg);
+            box-shadow: var(--shadow-glow);
+            position: relative;
+            z-index: 1;
         }
         
         .section-title {
-            font-size: 20px;
-            font-weight: var(--font-weight-semibold);
+            font-family: var(--font-display);
+            font-size: var(--text-lg);
+            font-weight: 600;
             color: var(--text-primary);
+            position: relative;
+            z-index: 1;
         }
         
         .form-row {
@@ -84,16 +144,23 @@
             align-items: center;
             gap: var(--space-2);
             padding: var(--space-3);
-            background: var(--bg-secondary);
-            border: 1px solid var(--border-default);
+            background: var(--glass-white);
+            backdrop-filter: blur(var(--blur-glass));
+            border: 1px solid rgba(255, 255, 255, 0.1);
             border-radius: var(--radius-md);
             cursor: pointer;
             transition: all var(--transition-normal);
         }
         
         .personality-option:hover {
-            border-color: var(--color-primary);
-            background: var(--color-primary-pale);
+            border-color: var(--neural-blue);
+            background: rgba(0, 82, 255, 0.1);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 82, 255, 0.2);
+        }
+        
+        .personality-option input[type="checkbox"]:checked + label {
+            color: var(--cyber-green);
         }
         
         .personality-option input[type="checkbox"] {
@@ -105,7 +172,8 @@
             margin: 0;
             cursor: pointer;
             color: var(--text-primary);
-            font-weight: var(--font-weight-medium);
+            font-weight: 500;
+            transition: color var(--transition-normal);
         }
         
         .range-container {
@@ -119,22 +187,31 @@
         }
         
         .range-value {
-            background: var(--color-primary);
-            color: white;
+            background: var(--gradient-neural);
+            color: var(--pure-white);
             padding: var(--space-2) var(--space-3);
             border-radius: var(--radius-md);
-            font-weight: var(--font-weight-semibold);
+            font-weight: 600;
             min-width: 60px;
             text-align: center;
             font-size: 14px;
+            box-shadow: var(--shadow-glow);
         }
         
         .question-item {
-            background: var(--bg-secondary);
-            border: 1px solid var(--border-default);
-            border-radius: var(--radius-md);
+            background: var(--glass-white);
+            backdrop-filter: blur(var(--blur-glass));
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: var(--radius-lg);
             padding: var(--space-6);
             margin-bottom: var(--space-4);
+            transition: all var(--transition-normal);
+        }
+        
+        .question-item:hover {
+            border-color: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
         }
         
         .question-header {
@@ -145,61 +222,83 @@
         }
         
         .question-title {
-            font-weight: var(--font-weight-semibold);
+            font-weight: 600;
             color: var(--text-primary);
             margin: 0;
+            font-family: var(--font-display);
         }
         
         .remove-question {
-            background: var(--color-error);
-            color: white;
+            background: linear-gradient(135deg, #ff4444 0%, #cc0000 100%);
+            color: var(--pure-white);
             border: none;
             padding: var(--space-1) var(--space-3);
             border-radius: var(--radius-sm);
             cursor: pointer;
             font-size: 12px;
-            font-weight: var(--font-weight-medium);
+            font-weight: 500;
             transition: all var(--transition-normal);
         }
         
         .remove-question:hover {
-            background: var(--color-error-hover);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(255, 68, 68, 0.3);
         }
         
         .add-question {
-            background: var(--color-success);
-            color: white;
+            background: var(--gradient-ai);
+            color: var(--pure-white);
             border: none;
             padding: var(--space-3) var(--space-5);
             border-radius: var(--radius-md);
             cursor: pointer;
-            font-weight: var(--font-weight-medium);
+            font-weight: 500;
             margin-top: var(--space-4);
             transition: all var(--transition-normal);
+            box-shadow: var(--shadow-glow);
         }
         
         .add-question:hover {
-            background: var(--color-success-hover);
-            transform: translateY(-1px);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-hover);
         }
         
         .create-btn {
-            background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-purple) 100%);
-            color: white;
+            background: var(--gradient-neural);
+            color: var(--pure-white);
             border: none;
             padding: var(--space-4) var(--space-8);
             font-size: 18px;
-            font-weight: var(--font-weight-semibold);
+            font-weight: 600;
+            font-family: var(--font-display);
             border-radius: var(--radius-lg);
             cursor: pointer;
             transition: all var(--transition-normal);
             width: 100%;
             margin-top: var(--space-6);
+            box-shadow: var(--shadow-glow);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .create-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.6s ease;
         }
         
         .create-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: var(--shadow-lg);
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-hover);
+        }
+        
+        .create-btn:hover::before {
+            left: 100%;
         }
         
         .create-btn:disabled {
@@ -215,6 +314,16 @@
             color: var(--text-secondary);
         }
         
+        .loading-spinner {
+            width: 48px;
+            height: 48px;
+            border: 3px solid rgba(255, 255, 255, 0.1);
+            border-top: 3px solid var(--neural-blue);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto var(--space-4);
+        }
+        
         .result {
             margin-top: var(--space-4);
             padding: var(--space-4);
@@ -223,15 +332,106 @@
         }
         
         .result.success {
-            background: var(--color-success-pale);
-            color: var(--color-success-dark);
-            border: 1px solid var(--color-success);
+            background: rgba(0, 255, 136, 0.1);
+            color: var(--cyber-green);
+            border: 1px solid var(--cyber-green);
         }
         
         .result.error {
-            background: var(--color-error-pale);
-            color: var(--color-error-dark);
-            border: 1px solid var(--color-error);
+            background: rgba(255, 68, 68, 0.1);
+            color: #ff4444;
+            border: 1px solid #ff4444;
+        }
+        
+        /* === INPUT & FORM STYLES === */
+        .input-group {
+            margin-bottom: var(--space-6);
+        }
+        
+        .input-label {
+            display: block;
+            margin-bottom: var(--space-2);
+            color: var(--text-primary);
+            font-weight: 600;
+            font-size: var(--text-base);
+        }
+        
+        .input, .textarea, .select {
+            width: 100%;
+            padding: var(--space-4);
+            background: var(--glass-white);
+            backdrop-filter: blur(var(--blur-glass));
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: var(--radius-lg);
+            color: var(--text-primary);
+            font-size: var(--text-base);
+            font-family: var(--font-body);
+            transition: all var(--transition-normal);
+            min-height: 56px;
+        }
+        
+        .input:focus, .textarea:focus, .select:focus {
+            outline: none;
+            border-color: var(--neural-blue);
+            box-shadow: 0 0 20px rgba(0, 82, 255, 0.2);
+            transform: translateY(-1px);
+            background: rgba(255, 255, 255, 0.08);
+        }
+        
+        .input::placeholder, .textarea::placeholder {
+            color: var(--text-muted);
+        }
+        
+        .textarea {
+            resize: vertical;
+            min-height: 120px;
+        }
+        
+        .select {
+            cursor: pointer;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23ffffff' d='M6 9L2 5h8z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right var(--space-3) center;
+            padding-right: var(--space-8);
+        }
+        
+        .range-slider {
+            width: 100%;
+            height: 6px;
+            border-radius: 3px;
+            background: rgba(255, 255, 255, 0.1);
+            outline: none;
+            -webkit-appearance: none;
+        }
+        
+        .range-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: var(--gradient-neural);
+            cursor: pointer;
+            box-shadow: var(--shadow-glow);
+        }
+        
+        .range-slider::-moz-range-thumb {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: var(--gradient-neural);
+            cursor: pointer;
+            box-shadow: var(--shadow-glow);
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 var(--space-6);
+        }
+        
+        .section {
+            padding: var(--space-8) 0 var(--space-12) 0;
         }
         
         @keyframes spin {
@@ -309,12 +509,12 @@
                     </div>
                     
                     <div class="input-group">
-                        <label for="name" class="input-label">Assistant Name <span style="color: var(--color-error);">*</span></label>
+                        <label for="name" class="input-label">Assistant Name <span style="color: #ff4444;">*</span></label>
                         <input type="text" id="name" name="name" class="input" required placeholder="e.g., Customer Support Assistant">
                     </div>
                     
                     <div class="input-group">
-                        <label for="first_message" class="input-label">First Message <span style="color: var(--color-error);">*</span></label>
+                        <label for="first_message" class="input-label">First Message <span style="color: #ff4444;">*</span></label>
                         <textarea id="first_message" name="first_message" class="input textarea" required placeholder="Hello! How can I help you today?" rows="3"></textarea>
                     </div>
                 </div>
