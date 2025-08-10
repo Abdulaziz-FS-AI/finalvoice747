@@ -146,10 +146,17 @@
             padding: var(--space-3);
             background: var(--glass-white);
             backdrop-filter: blur(var(--blur-glass));
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            border: 2px solid rgba(255, 255, 255, 0.1);
             border-radius: var(--radius-md);
             cursor: pointer;
             transition: all var(--transition-normal);
+        }
+        
+        .personality-option:has(input:checked) {
+            border-color: var(--cyber-green);
+            background: rgba(0, 255, 157, 0.1);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(0, 255, 157, 0.2);
         }
         
         .personality-option:hover {
@@ -161,11 +168,17 @@
         
         .personality-option input[type="checkbox"]:checked + label {
             color: var(--cyber-green);
+            font-weight: 600;
         }
         
         .personality-option input[type="checkbox"] {
-            width: auto;
+            width: 18px;
+            height: 18px;
             margin: 0;
+            margin-right: 8px;
+            cursor: pointer;
+            accent-color: var(--neural-blue);
+            flex-shrink: 0;
         }
         
         .personality-option label {
@@ -343,6 +356,38 @@
             border: 1px solid #ff4444;
         }
         
+        .result.warning {
+            background: rgba(255, 193, 7, 0.1);
+            color: #ffc107;
+            border: 1px solid #ffc107;
+        }
+        
+        .create-btn {
+            width: 100%;
+            background: var(--gradient-neural);
+            color: var(--pure-white);
+            padding: var(--space-4) var(--space-6);
+            border: none;
+            border-radius: var(--radius-lg);
+            font-size: var(--text-lg);
+            font-weight: 600;
+            cursor: pointer;
+            transition: all var(--transition-normal);
+            box-shadow: var(--shadow-glow);
+            margin-top: var(--space-6);
+        }
+        
+        .create-btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(0, 82, 255, 0.3);
+        }
+        
+        .create-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
         /* === INPUT & FORM STYLES === */
         .input-group {
             margin-bottom: var(--space-6);
@@ -437,6 +482,46 @@
         @keyframes spin {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
+        }
+        
+        /* Question item styles */
+        .question-item {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: var(--radius-lg);
+            padding: var(--space-6);
+            margin-bottom: var(--space-4);
+        }
+        
+        .question-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--space-4);
+        }
+        
+        .question-title {
+            color: var(--text-primary);
+            font-size: var(--text-lg);
+            font-weight: 600;
+        }
+        
+        /* Select dropdown visual feedback */
+        select.input:focus,
+        select.input:valid {
+            border-color: var(--cyber-green);
+            box-shadow: 0 0 0 2px rgba(0, 255, 157, 0.2);
+        }
+        
+        select.input option {
+            background: var(--deep-space);
+            color: var(--text-primary);
+        }
+        
+        /* Range slider enhancements */
+        .range-slider:focus {
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(0, 82, 255, 0.3);
         }
         
         @media (max-width: 768px) {
@@ -558,6 +643,7 @@
                         <div class="input-group">
                             <label for="background_sound" class="input-label">Background Sound</label>
                             <select id="background_sound" name="background_sound" class="input select">
+                                <option value="">Select background sound...</option>
                                 <option value="office">Office Environment</option>
                                 <option value="off">No Background</option>
                             </select>
@@ -578,7 +664,7 @@
                         <div id="structuredQuestions">
                             <!-- Questions added dynamically -->
                         </div>
-                        <button type="button" class="add-question" onclick="addStructuredQuestion()">+ Add Question</button>
+                        <button type="button" class="btn btn-secondary" onclick="addStructuredQuestion()">+ Add Question</button>
                     </div>
                     
                     <div class="input-group">
@@ -713,6 +799,17 @@
                             option.textContent = `${voice.name} - ${voice.description}`;
                             voiceSelect.appendChild(option);
                         });
+                        
+                        // Add change listener for visual feedback
+                        voiceSelect.addEventListener('change', function() {
+                            if (this.value) {
+                                this.style.color = 'var(--cyber-green)';
+                                this.style.fontWeight = '600';
+                            } else {
+                                this.style.color = '';
+                                this.style.fontWeight = '';
+                            }
+                        });
                     } else {
                         console.warn('⚠️ Voice API returned unsuccessful response');
                         voiceSelect.innerHTML = '<option value="">Error loading voices</option>';
@@ -759,6 +856,17 @@
                 });
                 console.log(`✅ Loaded ${evaluationMethods.length} evaluation methods`);
                 
+                // Add change listener for visual feedback
+                evalSelect.addEventListener('change', function() {
+                    if (this.value) {
+                        this.style.color = 'var(--cyber-green)';
+                        this.style.fontWeight = '600';
+                    } else {
+                        this.style.color = '';
+                        this.style.fontWeight = '';
+                    }
+                });
+                
             } catch (error) {
                 console.error('Error loading config:', error);
                 showResult('error', 'Failed to load configuration options');
@@ -773,11 +881,17 @@
             const durationValue = document.getElementById('durationValue');
             
             if (durationSlider && durationValue) {
-                durationSlider.addEventListener('input', function() {
-                    const minutes = Math.floor(this.value / 60);
-                    const seconds = this.value % 60;
+                function updateDurationDisplay() {
+                    const minutes = Math.floor(durationSlider.value / 60);
+                    const seconds = durationSlider.value % 60;
                     durationValue.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
-                });
+                }
+                
+                durationSlider.addEventListener('input', updateDurationDisplay);
+                durationSlider.addEventListener('change', updateDurationDisplay);
+                
+                // Set initial value
+                updateDurationDisplay();
                 console.log('✅ Duration slider listener set up');
             } else {
                 console.error('❌ Duration slider elements not found');
@@ -790,6 +904,21 @@
                 console.log('✅ Form submit listener set up');
             } else {
                 console.error('❌ Assistant form not found');
+            }
+            
+            // Background sound visual feedback
+            const backgroundSelect = document.getElementById('background_sound');
+            if (backgroundSelect) {
+                backgroundSelect.addEventListener('change', function() {
+                    if (this.value) {
+                        this.style.color = 'var(--cyber-green)';
+                        this.style.fontWeight = '600';
+                    } else {
+                        this.style.color = '';
+                        this.style.fontWeight = '';
+                    }
+                });
+                console.log('✅ Background sound listener set up');
             }
             
             console.log('✅ All event listeners configured');
@@ -810,7 +939,7 @@
             questionDiv.innerHTML = `
                 <div class="question-header">
                     <h4 class="question-title">Question ${questionCount}</h4>
-                    <button type="button" class="remove-question" onclick="removeQuestion(this)">Remove</button>
+                    <button type="button" class="btn btn-danger btn-sm" onclick="removeQuestion(this)">Remove</button>
                 </div>
                 <div class="form-row">
                     <div class="input-group">
@@ -851,55 +980,66 @@
             button.closest('.question-item').remove();
         }
         
+        // Handle form submission
         async function handleFormSubmit(e) {
             e.preventDefault();
+            console.log('🚀 Form submission started');
             
             const form = e.target;
             const formData = new FormData(form);
             
-            // Convert form data to JSON
-            const data = {};
-            
-            // Handle regular fields
-            for (let [key, value] of formData.entries()) {
-                if (key.includes('[') && key.includes(']')) {
-                    // Handle structured questions
-                    continue;
-                } else if (key === 'personality_traits') {
-                    if (!data.personality_traits) data.personality_traits = [];
-                    data.personality_traits.push(value);
-                } else {
-                    data[key] = value;
-                }
-            }
-            
-            // Handle structured questions
-            const structuredQuestions = [];
-            const questionInputs = form.querySelectorAll('input[name*="structured_questions"], textarea[name*="structured_questions"], select[name*="structured_questions"]');
-            const questionData = {};
-            
-            questionInputs.forEach(input => {
-                const match = input.name.match(/structured_questions\[(\d+)\]\[(\w+)\]/);
-                if (match) {
-                    const [, index, field] = match;
-                    if (!questionData[index]) questionData[index] = {};
-                    questionData[index][field] = input.type === 'checkbox' ? input.checked : input.value;
-                }
-            });
-            
-            // Convert to array
-            Object.values(questionData).forEach(q => {
-                if (q.question) structuredQuestions.push(q);
-            });
-            
-            data.structured_questions = structuredQuestions;
-            
             // Show loading state
-            document.getElementById('createBtn').disabled = true;
-            document.getElementById('loading').style.display = 'block';
-            document.getElementById('result').style.display = 'none';
+            const createBtn = document.getElementById('createBtn');
+            const loading = document.getElementById('loading');
+            const result = document.getElementById('result');
+            
+            createBtn.disabled = true;
+            loading.style.display = 'block';
+            result.style.display = 'none';
             
             try {
+                // Convert form data to JSON
+                const data = {};
+                
+                // Handle regular fields
+                for (let [key, value] of formData.entries()) {
+                    if (key.includes('[') && key.includes(']')) {
+                        // Handle structured questions - skip for now
+                        continue;
+                    } else if (key === 'personality_traits') {
+                        if (!data.personality_traits) data.personality_traits = [];
+                        data.personality_traits.push(value);
+                    } else {
+                        data[key] = value;
+                    }
+                }
+                
+                // Handle structured questions
+                const structuredQuestions = [];
+                const questionInputs = form.querySelectorAll('input[name*="structured_questions"], textarea[name*="structured_questions"], select[name*="structured_questions"]');
+                const questionData = {};
+                
+                questionInputs.forEach(input => {
+                    const match = input.name.match(/structured_questions\[(\d+)\]\[(\w+)\]/);
+                    if (match) {
+                        const [, index, field] = match;
+                        if (!questionData[index]) questionData[index] = {};
+                        questionData[index][field] = input.type === 'checkbox' ? input.checked : input.value;
+                    }
+                });
+                
+                // Convert to array
+                Object.values(questionData).forEach(q => {
+                    if (q.question && q.question.trim()) {
+                        structuredQuestions.push(q);
+                    }
+                });
+                
+                data.structured_questions = structuredQuestions;
+                
+                console.log('📤 Sending data:', data);
+                
+                // Make authenticated API request
                 const response = await authenticatedFetchSimple('/api/assistants', {
                     method: 'POST',
                     headers: {
@@ -912,30 +1052,45 @@
                     throw new Error('Authentication failed');
                 }
                 
-                const result = await response.json();
+                const apiResult = await response.json();
+                console.log('📥 API Response:', apiResult);
                 
-                if (result.success && result.data) {
-                    showResult('success', `Assistant "${data.name}" created successfully! You can now manage it from the Assistants page.`);
+                if (response.ok && apiResult.success && apiResult.data) {
+                    showResult('success', `Assistant "${data.name}" created successfully! Redirecting to assistants page...`);
+                    
+                    // Reset form
                     form.reset();
                     questionCount = 0;
                     document.getElementById('structuredQuestions').innerHTML = '';
                     
-                    // Redirect to assistants page after 2 seconds
+                    // Reset dropdown styles
+                    const selects = form.querySelectorAll('select');
+                    selects.forEach(select => {
+                        select.style.color = '';
+                        select.style.fontWeight = '';
+                    });
+                    
+                    // Redirect after 2 seconds
                     setTimeout(() => {
                         window.location.href = '/assistants';
                     }, 2000);
+                    
+                } else if (apiResult.success && !apiResult.data) {
+                    // Silent failure - limits exceeded
+                    showResult('warning', 'You have reached the maximum limit for assistants in your demo account.');
                 } else {
-                    showResult('error', result.error || 'Failed to create assistant. Please try again.');
+                    showResult('error', apiResult.error || 'Failed to create assistant. Please try again.');
                 }
                 
             } catch (error) {
-                console.error('Error:', error);
+                console.error('❌ Form submission error:', error);
                 showResult('error', 'Failed to create assistant. Please check your connection and try again.');
             } finally {
-                document.getElementById('createBtn').disabled = false;
-                document.getElementById('loading').style.display = 'none';
+                createBtn.disabled = false;
+                loading.style.display = 'none';
             }
         }
+        
         
         // Simplified authenticated fetch
         async function authenticatedFetchSimple(url, options = {}) {
