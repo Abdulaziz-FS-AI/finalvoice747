@@ -66,7 +66,34 @@ app.get('/', (req, res) => {
 
 // Direct dashboard access
 app.get('/dashboard', (req, res) => {
-    res.redirect('/dashboard.html');
+    res.sendFile(path.join(__dirname, 'public', 'dashboard.html'));
+});
+
+// Create assistant page
+app.get('/create-assistant', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'create-assistant.html'));
+});
+
+// Authentication page
+app.get('/auth', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'auth.html'));
+});
+
+// Other pages with clean URLs
+app.get('/assistants', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'assistants.html'));
+});
+
+app.get('/phone-numbers', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'phone-numbers.html'));
+});
+
+app.get('/analytics', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'analytics.html'));
+});
+
+app.get('/usage', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'usage.html'));
 });
 
 // API Routes (protected by auth)
@@ -91,10 +118,10 @@ app.use((err, req, res, next) => {
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
     console.log(`Landing page: http://localhost:${PORT}`);
-    console.log(`Dashboard: http://localhost:${PORT}/dashboard.html`);
-    console.log(`Auth/Sign-up: http://localhost:${PORT}/auth.html`);
-    console.log(`Create assistant: http://localhost:${PORT}/index.html`);
-    console.log(`Manage assistants: http://localhost:${PORT}/assistants.html`);
-    console.log(`Phone numbers: http://localhost:${PORT}/phone-numbers.html`);
-    console.log(`Analytics: http://localhost:${PORT}/analytics.html`);
+    console.log(`Dashboard: http://localhost:${PORT}/dashboard`);
+    console.log(`Auth/Sign-up: http://localhost:${PORT}/auth`);
+    console.log(`Create assistant: http://localhost:${PORT}/create-assistant`);
+    console.log(`Manage assistants: http://localhost:${PORT}/assistants`);
+    console.log(`Phone numbers: http://localhost:${PORT}/phone-numbers`);
+    console.log(`Analytics: http://localhost:${PORT}/analytics`);
 });

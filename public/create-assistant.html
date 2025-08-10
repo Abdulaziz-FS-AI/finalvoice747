@@ -1,0 +1,632 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Assistant - Voice Matrix AI</title>
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Design System -->
+    <link rel="stylesheet" href="/css/design-system.css">
+    
+    <!-- Theme Management -->
+    <script src="/js/theme.js"></script>
+    
+    <style>
+        .page-header {
+            padding: var(--space-8) 0;
+            background: var(--bg-primary);
+            border-bottom: 1px solid var(--border-default);
+        }
+        
+        .page-title {
+            margin-bottom: var(--space-2);
+        }
+        
+        .page-subtitle {
+            color: var(--text-secondary);
+        }
+        
+        .form-section {
+            background: var(--bg-primary);
+            border: 1px solid var(--border-default);
+            border-radius: var(--radius-lg);
+            padding: var(--space-8);
+            margin-bottom: var(--space-6);
+        }
+        
+        .section-header {
+            display: flex;
+            align-items: center;
+            gap: var(--space-3);
+            margin-bottom: var(--space-6);
+        }
+        
+        .section-number {
+            background: var(--color-primary);
+            color: white;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: var(--font-weight-semibold);
+            font-size: 14px;
+        }
+        
+        .section-title {
+            font-size: 20px;
+            font-weight: var(--font-weight-semibold);
+            color: var(--text-primary);
+        }
+        
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: var(--space-6);
+        }
+        
+        .personality-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: var(--space-3);
+            margin-top: var(--space-3);
+        }
+        
+        .personality-option {
+            display: flex;
+            align-items: center;
+            gap: var(--space-2);
+            padding: var(--space-3);
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-default);
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            transition: all var(--transition-normal);
+        }
+        
+        .personality-option:hover {
+            border-color: var(--color-primary);
+            background: var(--color-primary-pale);
+        }
+        
+        .personality-option input[type="checkbox"] {
+            width: auto;
+            margin: 0;
+        }
+        
+        .personality-option label {
+            margin: 0;
+            cursor: pointer;
+            color: var(--text-primary);
+            font-weight: var(--font-weight-medium);
+        }
+        
+        .range-container {
+            display: flex;
+            align-items: center;
+            gap: var(--space-4);
+        }
+        
+        .range-slider {
+            flex: 1;
+        }
+        
+        .range-value {
+            background: var(--color-primary);
+            color: white;
+            padding: var(--space-2) var(--space-3);
+            border-radius: var(--radius-md);
+            font-weight: var(--font-weight-semibold);
+            min-width: 60px;
+            text-align: center;
+            font-size: 14px;
+        }
+        
+        .question-item {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-default);
+            border-radius: var(--radius-md);
+            padding: var(--space-6);
+            margin-bottom: var(--space-4);
+        }
+        
+        .question-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--space-4);
+        }
+        
+        .question-title {
+            font-weight: var(--font-weight-semibold);
+            color: var(--text-primary);
+            margin: 0;
+        }
+        
+        .remove-question {
+            background: var(--color-error);
+            color: white;
+            border: none;
+            padding: var(--space-1) var(--space-3);
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: var(--font-weight-medium);
+            transition: all var(--transition-normal);
+        }
+        
+        .remove-question:hover {
+            background: var(--color-error-hover);
+        }
+        
+        .add-question {
+            background: var(--color-success);
+            color: white;
+            border: none;
+            padding: var(--space-3) var(--space-5);
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            font-weight: var(--font-weight-medium);
+            margin-top: var(--space-4);
+            transition: all var(--transition-normal);
+        }
+        
+        .add-question:hover {
+            background: var(--color-success-hover);
+            transform: translateY(-1px);
+        }
+        
+        .create-btn {
+            background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-purple) 100%);
+            color: white;
+            border: none;
+            padding: var(--space-4) var(--space-8);
+            font-size: 18px;
+            font-weight: var(--font-weight-semibold);
+            border-radius: var(--radius-lg);
+            cursor: pointer;
+            transition: all var(--transition-normal);
+            width: 100%;
+            margin-top: var(--space-6);
+        }
+        
+        .create-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+        
+        .create-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .loading {
+            display: none;
+            text-align: center;
+            padding: var(--space-6);
+            color: var(--text-secondary);
+        }
+        
+        .result {
+            margin-top: var(--space-4);
+            padding: var(--space-4);
+            border-radius: var(--radius-md);
+            display: none;
+        }
+        
+        .result.success {
+            background: var(--color-success-pale);
+            color: var(--color-success-dark);
+            border: 1px solid var(--color-success);
+        }
+        
+        .result.error {
+            background: var(--color-error-pale);
+            color: var(--color-error-dark);
+            border: 1px solid var(--color-error);
+        }
+        
+        @media (max-width: 768px) {
+            .form-row {
+                grid-template-columns: 1fr;
+                gap: var(--space-4);
+            }
+            
+            .personality-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .page-header {
+                padding: var(--space-6) 0;
+            }
+            
+            .form-section {
+                padding: var(--space-6);
+            }
+        }
+    </style>
+    
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="/js/auth-helper.js"></script>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="nav">
+        <div class="nav-content">
+            <a href="/dashboard" class="nav-brand">Voice Matrix AI</a>
+            <div class="nav-tabs">
+                <a href="/dashboard" class="nav-tab">Dashboard</a>
+                <a href="/assistants" class="nav-tab active">Assistants</a>
+                <a href="/phone-numbers" class="nav-tab">Phone Numbers</a>
+                <a href="/analytics" class="nav-tab">Analytics</a>
+            </div>
+            <div class="nav-user">
+                <span class="nav-user-email" id="userEmail">Loading...</span>
+                <button class="btn btn-danger btn-sm" onclick="signOut()">Sign Out</button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Page Header -->
+    <section class="page-header">
+        <div class="container">
+            <h1 class="text-h1 page-title">Create AI Assistant</h1>
+            <p class="text-lg page-subtitle">Configure your AI assistant with custom voice, personality, and conversation flow</p>
+        </div>
+    </section>
+
+    <!-- Main Content -->
+    <main class="section">
+        <div class="container">
+            <form id="assistantForm">
+                <!-- Basic Configuration -->
+                <div class="form-section">
+                    <div class="section-header">
+                        <div class="section-number">1</div>
+                        <h2 class="section-title">Basic Configuration</h2>
+                    </div>
+                    
+                    <div class="input-group">
+                        <label for="name" class="input-label">Assistant Name <span style="color: var(--color-error);">*</span></label>
+                        <input type="text" id="name" name="name" class="input" required placeholder="e.g., Customer Support Assistant">
+                    </div>
+                    
+                    <div class="input-group">
+                        <label for="first_message" class="input-label">First Message <span style="color: var(--color-error);">*</span></label>
+                        <textarea id="first_message" name="first_message" class="input textarea" required placeholder="Hello! How can I help you today?" rows="3"></textarea>
+                    </div>
+                </div>
+
+                <!-- Voice & Personality -->
+                <div class="form-section">
+                    <div class="section-header">
+                        <div class="section-number">2</div>
+                        <h2 class="section-title">Voice & Personality</h2>
+                    </div>
+                    
+                    <div class="input-group">
+                        <label for="voice_id" class="input-label">Voice Selection</label>
+                        <select id="voice_id" name="voice_id" class="input select">
+                            <option value="">Loading voices...</option>
+                        </select>
+                    </div>
+                    
+                    <div class="input-group">
+                        <label class="input-label">Personality Traits</label>
+                        <div class="personality-grid" id="personalityGrid">
+                            <!-- Checkboxes loaded via JavaScript -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Call Settings -->
+                <div class="form-section">
+                    <div class="section-header">
+                        <div class="section-number">3</div>
+                        <h2 class="section-title">Call Settings</h2>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="input-group">
+                            <label for="max_call_duration" class="input-label">Max Call Duration</label>
+                            <div class="range-container">
+                                <input type="range" id="max_call_duration" name="max_call_duration" min="30" max="600" value="300" class="range-slider">
+                                <div class="range-value" id="durationValue">5:00</div>
+                            </div>
+                        </div>
+                        <div class="input-group">
+                            <label for="background_sound" class="input-label">Background Sound</label>
+                            <select id="background_sound" name="background_sound" class="input select">
+                                <option value="office">Office Environment</option>
+                                <option value="off">No Background</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Advanced Features -->
+                <div class="form-section">
+                    <div class="section-header">
+                        <div class="section-number">4</div>
+                        <h2 class="section-title">Advanced Features</h2>
+                    </div>
+                    
+                    <div class="input-group">
+                        <label class="input-label">Structured Questions</label>
+                        <p class="text-sm text-secondary">Questions that the assistant will ask to collect specific information</p>
+                        <div id="structuredQuestions">
+                            <!-- Questions added dynamically -->
+                        </div>
+                        <button type="button" class="add-question" onclick="addStructuredQuestion()">+ Add Question</button>
+                    </div>
+                    
+                    <div class="input-group">
+                        <label for="evaluation_method" class="input-label">Call Evaluation Method</label>
+                        <select id="evaluation_method" name="evaluation_method" class="input select">
+                            <option value="">Loading evaluation methods...</option>
+                        </select>
+                    </div>
+                </div>
+
+                <button type="submit" class="create-btn" id="createBtn">Create Assistant</button>
+                
+                <div class="loading" id="loading">
+                    <div class="loading-spinner"></div>
+                    <p>Creating your assistant...</p>
+                </div>
+                
+                <div class="result" id="result"></div>
+            </form>
+        </div>
+    </main>
+
+    <script>
+        // Global variables
+        let currentUser;
+        let questionCount = 0;
+        
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', async function() {
+            try {
+                currentUser = await requireAuth();
+                if (!currentUser) return;
+                
+                // Update user email in nav
+                document.getElementById('userEmail').textContent = currentUser.email;
+                
+                await loadConfig();
+                setupEventListeners();
+            } catch (error) {
+                console.error('Initialization error:', error);
+                showResult('error', 'Failed to initialize page: ' + error.message);
+            }
+        });
+        
+        async function loadConfig() {
+            try {
+                // Load voices from API endpoint
+                const voiceResponse = await fetch('/api/config/voices');
+                const voiceData = await voiceResponse.json();
+                
+                // Load voice options
+                const voiceSelect = document.getElementById('voice_id');
+                voiceSelect.innerHTML = '<option value="">Select a voice...</option>';
+                if (voiceData.success) {
+                    voiceData.data.forEach(voice => {
+                        const option = document.createElement('option');
+                        option.value = voice.id;
+                        option.textContent = `${voice.name} - ${voice.description}`;
+                        voiceSelect.appendChild(option);
+                    });
+                } else {
+                    voiceSelect.innerHTML = '<option value="">Error loading voices</option>';
+                }
+                
+                // Load personality traits
+                const personalityGrid = document.getElementById('personalityGrid');
+                const traits = ['Professional', 'Friendly', 'Energetic', 'Calming', 'Confident', 'Empathetic', 'Witty', 'Patient', 'Knowledgeable', 'Supportive'];
+                
+                traits.forEach(trait => {
+                    const div = document.createElement('div');
+                    div.className = 'personality-option';
+                    div.innerHTML = `
+                        <input type="checkbox" id="trait_${trait.toLowerCase()}" name="personality_traits" value="${trait}">
+                        <label for="trait_${trait.toLowerCase()}">${trait}</label>
+                    `;
+                    personalityGrid.appendChild(div);
+                });
+                
+                // Load evaluation methods
+                const evalSelect = document.getElementById('evaluation_method');
+                const evaluationMethods = [
+                    { value: "NumericScale", label: "Numeric Scale (1-10)" },
+                    { value: "DescriptiveScale", label: "Descriptive (Excellent/Good/Fair/Poor)" },
+                    { value: "Checklist", label: "Checklist of Criteria" },
+                    { value: "BinaryEvaluation", label: "Binary (Success/Failure)" },
+                    { value: "NoEvaluation", label: "No Evaluation" }
+                ];
+                
+                evalSelect.innerHTML = '<option value="">Select evaluation method...</option>';
+                evaluationMethods.forEach(method => {
+                    const option = document.createElement('option');
+                    option.value = method.value;
+                    option.textContent = method.label;
+                    evalSelect.appendChild(option);
+                });
+                
+            } catch (error) {
+                console.error('Error loading config:', error);
+                showResult('error', 'Failed to load configuration options');
+            }
+        }
+        
+        function setupEventListeners() {
+            // Duration slider
+            const durationSlider = document.getElementById('max_call_duration');
+            const durationValue = document.getElementById('durationValue');
+            
+            durationSlider.addEventListener('input', function() {
+                const minutes = Math.floor(this.value / 60);
+                const seconds = this.value % 60;
+                durationValue.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+            });
+            
+            // Form submission
+            document.getElementById('assistantForm').addEventListener('submit', handleFormSubmit);
+        }
+        
+        function addStructuredQuestion() {
+            questionCount++;
+            const container = document.getElementById('structuredQuestions');
+            
+            const questionDiv = document.createElement('div');
+            questionDiv.className = 'question-item';
+            questionDiv.innerHTML = `
+                <div class="question-header">
+                    <h4 class="question-title">Question ${questionCount}</h4>
+                    <button type="button" class="remove-question" onclick="removeQuestion(this)">Remove</button>
+                </div>
+                <div class="form-row">
+                    <div class="input-group">
+                        <label class="input-label">Question</label>
+                        <input type="text" name="structured_questions[${questionCount}][question]" class="input" placeholder="What is your name?" required>
+                    </div>
+                    <div class="input-group">
+                        <label class="input-label">Field Name</label>
+                        <input type="text" name="structured_questions[${questionCount}][field_name]" class="input" placeholder="customer_name">
+                    </div>
+                </div>
+                <div class="input-group">
+                    <label class="input-label">Description</label>
+                    <textarea name="structured_questions[${questionCount}][description]" class="input textarea" placeholder="Description of what this question captures" rows="2"></textarea>
+                </div>
+                <div class="form-row">
+                    <div class="input-group">
+                        <label class="input-label">Type</label>
+                        <select name="structured_questions[${questionCount}][type]" class="input select">
+                            <option value="string">Text</option>
+                            <option value="number">Number</option>
+                            <option value="boolean">Yes/No</option>
+                        </select>
+                    </div>
+                    <div class="input-group">
+                        <label class="input-label" style="display: flex; align-items: center; gap: var(--space-2);">
+                            <input type="checkbox" name="structured_questions[${questionCount}][required]" value="true" style="width: auto; margin: 0;">
+                            Required Question
+                        </label>
+                    </div>
+                </div>
+            `;
+            
+            container.appendChild(questionDiv);
+        }
+        
+        function removeQuestion(button) {
+            button.closest('.question-item').remove();
+        }
+        
+        async function handleFormSubmit(e) {
+            e.preventDefault();
+            
+            const form = e.target;
+            const formData = new FormData(form);
+            
+            // Convert form data to JSON
+            const data = {};
+            
+            // Handle regular fields
+            for (let [key, value] of formData.entries()) {
+                if (key.includes('[') && key.includes(']')) {
+                    // Handle structured questions
+                    continue;
+                } else if (key === 'personality_traits') {
+                    if (!data.personality_traits) data.personality_traits = [];
+                    data.personality_traits.push(value);
+                } else {
+                    data[key] = value;
+                }
+            }
+            
+            // Handle structured questions
+            const structuredQuestions = [];
+            const questionInputs = form.querySelectorAll('input[name*="structured_questions"], textarea[name*="structured_questions"], select[name*="structured_questions"]');
+            const questionData = {};
+            
+            questionInputs.forEach(input => {
+                const match = input.name.match(/structured_questions\[(\d+)\]\[(\w+)\]/);
+                if (match) {
+                    const [, index, field] = match;
+                    if (!questionData[index]) questionData[index] = {};
+                    questionData[index][field] = input.type === 'checkbox' ? input.checked : input.value;
+                }
+            });
+            
+            // Convert to array
+            Object.values(questionData).forEach(q => {
+                if (q.question) structuredQuestions.push(q);
+            });
+            
+            data.structured_questions = structuredQuestions;
+            
+            // Show loading state
+            document.getElementById('createBtn').disabled = true;
+            document.getElementById('loading').style.display = 'block';
+            document.getElementById('result').style.display = 'none';
+            
+            try {
+                const response = await authenticatedFetch('/api/assistants', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(data)
+                });
+                
+                if (!response) {
+                    throw new Error('Authentication failed');
+                }
+                
+                const result = await response.json();
+                
+                if (result.success && result.data) {
+                    showResult('success', `Assistant "${data.name}" created successfully! You can now manage it from the Assistants page.`);
+                    form.reset();
+                    questionCount = 0;
+                    document.getElementById('structuredQuestions').innerHTML = '';
+                    
+                    // Redirect to assistants page after 2 seconds
+                    setTimeout(() => {
+                        window.location.href = '/assistants';
+                    }, 2000);
+                } else {
+                    showResult('error', result.error || 'Failed to create assistant. Please try again.');
+                }
+                
+            } catch (error) {
+                console.error('Error:', error);
+                showResult('error', 'Failed to create assistant. Please check your connection and try again.');
+            } finally {
+                document.getElementById('createBtn').disabled = false;
+                document.getElementById('loading').style.display = 'none';
+            }
+        }
+        
+        function showResult(type, message) {
+            const resultDiv = document.getElementById('result');
+            resultDiv.className = `result ${type}`;
+            resultDiv.textContent = message;
+            resultDiv.style.display = 'block';
+            
+            // Scroll to result
+            resultDiv.scrollIntoView({ behavior: 'smooth' });
+        }
+    </script>
+</body>
+</html>

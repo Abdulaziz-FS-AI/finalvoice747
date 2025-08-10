@@ -33,7 +33,7 @@ async function checkAuth() {
 async function requireAuth() {
     const user = await checkAuth();
     if (!user) {
-        window.location.href = '/auth.html';
+        window.location.href = '/auth';
         return null;
     }
     return user;
@@ -72,7 +72,7 @@ async function signOut() {
     }
     
     await supabaseClient.auth.signOut();
-    window.location.href = '/auth.html';
+    window.location.href = '/auth';
 }
 
 // Listen for auth state changes

@@ -154,19 +154,143 @@ class AssistantService {
         }
     }
     
-    // Build system prompt (no company name for demo)
+    // Build dynamic system prompt based on personality and questions
     buildSystemPrompt(formData) {
-        const personalityText = Array.isArray(formData.personality_traits) 
-            ? formData.personality_traits.join(', ') 
-            : formData.personality_traits || 'professional and friendly';
+        const personalityTraits = Array.isArray(formData.personality_traits) 
+            ? formData.personality_traits 
+            : (formData.personality_traits ? [formData.personality_traits] : ['professional', 'friendly']);
         
-        let structuredQuestionsInstructions = '';
+        // Build personality-specific instructions
+        const personalityInstructions = this.buildPersonalityInstructions(personalityTraits);
+        
+        // Build question-specific instructions - prioritize early asking for short calls
+        let questionInstructions = '';
         if (formData.structured_questions && formData.structured_questions.length > 0) {
-            const questions = formData.structured_questions.map(q => `- ${q.question}`).join('\n');
-            structuredQuestionsInstructions = `\n\nDuring the conversation, please ask the following questions and collect the responses:\n${questions}`;
+            questionInstructions = this.buildQuestionInstructions(formData.structured_questions);
         }
         
-        return `You are an AI assistant. Your personality should be ${personalityText}.${structuredQuestionsInstructions}`;
+        // Build evaluation instructions
+        let evaluationInstructions = '';
+        if (formData.evaluation_method && formData.evaluation_method !== 'NoEvaluation') {
+            evaluationInstructions = this.buildEvaluationInstructions(formData.evaluation_method);
+        }
+        
+        // Combine all parts into comprehensive system prompt
+        const systemPrompt = `You are a professional AI phone assistant for a business. ${personalityInstructions}
+
+CRITICAL: This is a SHORT CALL (limited time). You MUST ask essential questions within the first 30 seconds after greeting.
+
+${questionInstructions}
+
+CALL OBJECTIVES:
+- Gather required information IMMEDIATELY after greeting
+- Provide excellent customer service efficiently  
+- Maintain a natural, conversational flow
+- End calls professionally when objectives are met
+
+CONVERSATION FLOW (STRICT ORDER):
+1. Warm greeting (5-10 seconds)
+2. IMMEDIATELY ask required questions (next 20-30 seconds)
+3. Address caller's needs/concerns
+4. Confirm collected information
+5. Professional closing
+
+CONVERSATION GUIDELINES:
+- Greet warmly but briefly
+- Transition quickly to information gathering
+- Ask questions directly but politely
+- Don't wait for natural openings - create them
+- Confirm important information by repeating it back
+- Keep responses concise and focused
+- Use natural speech patterns but stay efficient
+
+${evaluationInstructions}
+
+IMPORTANT: Time is limited! Prioritize getting required information over lengthy conversations. Ask essential questions early and often.`;
+        
+        return systemPrompt;
+    }
+    
+    // Build personality-specific behavioral instructions
+    buildPersonalityInstructions(traits) {
+        const personalityMap = {
+            'Professional': 'Maintain a business-like tone while being warm and approachable. Use clear, direct language.',
+            'Friendly': 'Be warm, welcoming, and personable. Use a conversational tone that makes callers feel comfortable.',
+            'Energetic': 'Speak with enthusiasm and positive energy. Be upbeat and engaging throughout the conversation.',
+            'Calming': 'Use a soothing, measured tone. Help anxious callers feel at ease with your peaceful presence.',
+            'Confident': 'Speak with authority and certainty. Demonstrate expertise and competence in your responses.',
+            'Empathetic': 'Show genuine understanding and compassion. Acknowledge caller emotions and concerns.',
+            'Witty': 'Use appropriate humor and clever responses when suitable. Keep the mood light and engaging.',
+            'Patient': 'Never rush callers. Take time to explain things clearly and repeat information when needed.',
+            'Knowledgeable': 'Demonstrate expertise and provide detailed, accurate information when appropriate.',
+            'Supportive': 'Be encouraging and helpful. Focus on solutions and positive outcomes.'
+        };
+        
+        const instructions = traits
+            .map(trait => personalityMap[trait])
+            .filter(instruction => instruction)
+            .join(' ');
+        
+        return instructions || 'Be professional, friendly, and helpful in all interactions.';
+    }
+    
+    // Build dynamic question instructions - optimized for short calls
+    buildQuestionInstructions(questions) {
+        if (!questions || questions.length === 0) return '';
+        
+        const requiredQuestions = questions.filter(q => q.required);
+        const optionalQuestions = questions.filter(q => !q.required);
+        
+        let instructions = 'INFORMATION COLLECTION (SHORT CALL STRATEGY):\n';
+        
+        if (requiredQuestions.length > 0) {
+            instructions += 'REQUIRED INFORMATION (ASK IMMEDIATELY AFTER GREETING - FIRST 30 SECONDS):\n';
+            requiredQuestions.forEach((q, index) => {
+                const purpose = q.description ? ` (${q.description})` : '';
+                instructions += `${index + 1}. "${q.question}"${purpose}\n`;
+            });
+            
+            instructions += '\nSCRIPT EXAMPLE FOR REQUIRED QUESTIONS:\n';
+            instructions += '"Hello! Thanks for calling. To help you better, I need to quickly get some information. ';
+            if (requiredQuestions.length === 1) {
+                instructions += `${requiredQuestions[0].question}"`;
+            } else {
+                instructions += `First, ${requiredQuestions[0].question.toLowerCase()} And then, ${requiredQuestions[1]?.question?.toLowerCase() || 'your contact information'}"`;
+            }
+        }
+        
+        if (optionalQuestions.length > 0) {
+            instructions += '\n\nOPTIONAL INFORMATION (only if time permits after required info):\n';
+            optionalQuestions.forEach((q, index) => {
+                const purpose = q.description ? ` (${q.description})` : '';
+                instructions += `${index + 1}. "${q.question}"${purpose}\n`;
+            });
+        }
+        
+        instructions += `
+
+QUESTION STRATEGY FOR SHORT CALLS:
+- Ask required questions IMMEDIATELY after "Hello, thanks for calling"
+- Use transition phrases: "To help you better, I need to quickly get..."  
+- Don't wait for conversation to naturally lead to questions
+- Ask 2-3 required questions in rapid succession if needed
+- Use phrases like "Let me just get your..." to make it feel efficient
+- If caller tries to explain their issue first, say "I'll help with that right after I get your [required info]"
+- For hesitant callers: "This will just take 10 seconds so I can better assist you"`;
+        
+        return instructions;
+    }
+    
+    // Build evaluation-specific instructions
+    buildEvaluationInstructions(evaluationMethod) {
+        const evaluationMap = {
+            'NumericScale': '\nCALL SUCCESS METRICS:\nAim for high-quality interactions that would rate 8-10 on a satisfaction scale. Focus on resolution, clarity, and caller satisfaction.',
+            'DescriptiveScale': '\nCALL SUCCESS METRICS:\nStrive for "Excellent" interactions by being thorough, helpful, and professional throughout the call.',
+            'Checklist': '\nCALL SUCCESS METRICS:\nEnsure all objectives are met systematically. Check off each goal as you accomplish it during the conversation.',
+            'BinaryEvaluation': '\nCALL SUCCESS METRICS:\nFocus on achieving a clear successful outcome. Either fully accomplish the call objectives or clearly explain why objectives cannot be met.'
+        };
+        
+        return evaluationMap[evaluationMethod] || '';
     }
     
     // Build structured data schema

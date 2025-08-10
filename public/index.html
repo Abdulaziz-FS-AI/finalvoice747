@@ -3,613 +3,73 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Voice AI Assistant Creator</title>
+    <title>Voice Matrix AI - Redirecting...</title>
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Design System -->
+    <link rel="stylesheet" href="/css/design-system.css">
+    
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: #0f0f0f;
-            color: #ffffff;
-            line-height: 1.6;
-        }
-        
-        .container {
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 20px;
-        }
-        
-        .header {
-            text-align: center;
-            margin-bottom: 40px;
-        }
-        
-        .header h1 {
-            font-size: 2.5rem;
-            margin-bottom: 10px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-        
-        .form-section {
-            background: #1a1a1a;
-            border-radius: 12px;
-            padding: 30px;
-            margin-bottom: 30px;
-            border: 1px solid #333;
-        }
-        
-        .section-title {
-            font-size: 1.5rem;
-            margin-bottom: 20px;
-            color: #fff;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        
-        .section-number {
-            background: #667eea;
-            color: white;
-            width: 30px;
-            height: 30px;
-            border-radius: 50%;
+        .redirect-container {
+            min-height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-weight: bold;
-            font-size: 0.9rem;
-        }
-        
-        .form-group {
-            margin-bottom: 20px;
-        }
-        
-        .form-row {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
-        }
-        
-        label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 500;
-            color: #ccc;
-        }
-        
-        .required {
-            color: #ff6b6b;
-        }
-        
-        input, select, textarea {
-            width: 100%;
-            padding: 12px;
-            border: 1px solid #333;
-            border-radius: 8px;
-            background: #2a2a2a;
-            color: #fff;
-            font-size: 16px;
-            transition: border-color 0.3s ease;
-        }
-        
-        input:focus, select:focus, textarea:focus {
-            outline: none;
-            border-color: #667eea;
-            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-        }
-        
-        textarea {
-            resize: vertical;
-            min-height: 100px;
-        }
-        
-        .personality-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 15px;
-            margin-top: 10px;
-        }
-        
-        .personality-option {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            padding: 10px;
-            background: #2a2a2a;
-            border-radius: 8px;
-            border: 1px solid #333;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-        
-        .personality-option:hover {
-            border-color: #667eea;
-        }
-        
-        .personality-option input[type="checkbox"] {
-            width: auto;
-        }
-        
-        .range-container {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-        
-        .range-slider {
-            flex: 1;
-        }
-        
-        .range-value {
-            background: #667eea;
-            color: white;
-            padding: 5px 10px;
-            border-radius: 6px;
-            font-weight: bold;
-            min-width: 60px;
             text-align: center;
+            background: var(--bg-primary);
         }
         
-        .structured-questions {
-            margin-top: 20px;
+        .redirect-content {
+            max-width: 400px;
+            padding: var(--space-8);
         }
         
-        .question-item {
-            background: #2a2a2a;
-            border: 1px solid #333;
-            border-radius: 8px;
-            padding: 20px;
-            margin-bottom: 15px;
+        .redirect-title {
+            font-size: 24px;
+            font-weight: var(--font-weight-semibold);
+            color: var(--text-primary);
+            margin-bottom: var(--space-4);
         }
         
-        .question-header {
-            display: flex;
-            justify-content: between;
-            align-items: center;
-            margin-bottom: 15px;
+        .redirect-subtitle {
+            color: var(--text-secondary);
+            margin-bottom: var(--space-6);
         }
         
-        .remove-question {
-            background: #e74c3c;
-            color: white;
-            border: none;
-            padding: 5px 10px;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 14px;
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid var(--border-default);
+            border-top: 3px solid var(--color-primary);
+            border-radius: 50%;
+            margin: 0 auto;
+            animation: spin 1s linear infinite;
         }
         
-        .add-question {
-            background: #27ae60;
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 16px;
-            margin-top: 15px;
-        }
-        
-        .create-btn {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border: none;
-            padding: 15px 40px;
-            font-size: 18px;
-            font-weight: bold;
-            border-radius: 10px;
-            cursor: pointer;
-            transition: transform 0.2s ease;
-            width: 100%;
-            margin-top: 20px;
-        }
-        
-        .create-btn:hover {
-            transform: translateY(-2px);
-        }
-        
-        .create-btn:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-            transform: none;
-        }
-        
-        .loading {
-            display: none;
-            text-align: center;
-            padding: 20px;
-        }
-        
-        .result {
-            margin-top: 20px;
-            padding: 20px;
-            border-radius: 8px;
-            display: none;
-        }
-        
-        .result.success {
-            background: #d4edda;
-            color: #155724;
-            border: 1px solid #c3e6cb;
-        }
-        
-        .result.error {
-            background: #f8d7da;
-            color: #721c24;
-            border: 1px solid #f5c6cb;
-        }
-        
-        @media (max-width: 768px) {
-            .form-row {
-                grid-template-columns: 1fr;
-            }
-            
-            .personality-grid {
-                grid-template-columns: 1fr;
-            }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
     </style>
 </head>
 <body>
-    <!-- Navigation -->
-    <nav style="background: white; border-bottom: 1px solid #333; position: sticky; top: 0; z-index: 100; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);">
-        <div style="max-width: 1200px; margin: 0 auto; padding: 0 20px; display: flex; justify-content: space-between; align-items: center; height: 64px;">
-            <a href="/dashboard" style="font-size: 20px; font-weight: 600; color: #111827; text-decoration: none;">Voice AI Demo</a>
-            <div style="display: flex; gap: 8px;">
-                <a href="/dashboard" style="padding: 8px 16px; color: #6b7280; text-decoration: none; border-radius: 6px; font-weight: 500; transition: all 0.2s;">Dashboard</a>
-                <a href="/assistants" style="padding: 8px 16px; color: #6b7280; text-decoration: none; border-radius: 6px; font-weight: 500; transition: all 0.2s;">Assistants</a>
-                <a href="/phone-numbers" style="padding: 8px 16px; color: #6b7280; text-decoration: none; border-radius: 6px; font-weight: 500; transition: all 0.2s;">Phone Numbers</a>
-                <a href="/analytics" style="padding: 8px 16px; color: #6b7280; text-decoration: none; border-radius: 6px; font-weight: 500; transition: all 0.2s;">Analytics</a>
-            </div>
-            <div style="display: flex; align-items: center; gap: 16px;">
-                <span style="color: #6b7280; font-size: 14px;" id="userEmail">Loading...</span>
-                <button style="background: #ef4444; color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: 500;" onclick="signOut()">Sign Out</button>
-            </div>
+    <div class="redirect-container">
+        <div class="redirect-content">
+            <h1 class="redirect-title">Redirecting...</h1>
+            <p class="redirect-subtitle">Taking you to the assistant creation page</p>
+            <div class="spinner"></div>
         </div>
-    </nav>
-
-    <div class="container">
-        <div class="header">
-            <h1>Create Voice AI Assistant</h1>
-            <p>Configure your AI assistant with custom voice and personality</p>
-        </div>
-
-        <form id="assistantForm">
-            <!-- Basic Configuration -->
-            <div class="form-section">
-                <div class="section-title">
-                    <div class="section-number">1</div>
-                    Basic Configuration
-                </div>
-                
-                <div class="form-row">
-                    <div class="form-group">
-                        <label for="name">Assistant Name <span class="required">*</span></label>
-                        <input type="text" id="name" name="name" required placeholder="e.g., Customer Support Bot">
-                    </div>
-                </div>
-                
-                <div class="form-group">
-                    <label for="first_message">First Message <span class="required">*</span></label>
-                    <textarea id="first_message" name="first_message" required placeholder="Hello! How can I help you today?"></textarea>
-                </div>
-            </div>
-
-            <!-- Voice & Personality -->
-            <div class="form-section">
-                <div class="section-title">
-                    <div class="section-number">2</div>
-                    Voice & Personality
-                </div>
-                
-                <div class="form-group">
-                    <label for="voice_id">Voice Selection</label>
-                    <select id="voice_id" name="voice_id">
-                        <!-- Options loaded via JavaScript -->
-                    </select>
-                </div>
-                
-                <div class="form-group">
-                    <label>Personality Traits</label>
-                    <div class="personality-grid" id="personalityGrid">
-                        <!-- Checkboxes loaded via JavaScript -->
-                    </div>
-                </div>
-            </div>
-
-            <!-- Call Settings -->
-            <div class="form-section">
-                <div class="section-title">
-                    <div class="section-number">3</div>
-                    Call Settings
-                </div>
-                
-                <div class="form-row">
-                    <div class="form-group">
-                        <label for="max_call_duration">Max Call Duration</label>
-                        <div class="range-container">
-                            <input type="range" id="max_call_duration" name="max_call_duration" min="30" max="600" value="300" class="range-slider">
-                            <div class="range-value" id="durationValue">5:00</div>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label for="background_sound">Background Sound</label>
-                        <select id="background_sound" name="background_sound">
-                            <option value="office">Office Environment</option>
-                            <option value="off">No Background</option>
-                        </select>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Advanced Features -->
-            <div class="form-section">
-                <div class="section-title">
-                    <div class="section-number">4</div>
-                    Advanced Features
-                </div>
-                
-                <div class="form-group">
-                    <label>Structured Questions</label>
-                    <div id="structuredQuestions">
-                        <!-- Questions added dynamically -->
-                    </div>
-                    <button type="button" class="add-question" onclick="addStructuredQuestion()">+ Add Question</button>
-                </div>
-                
-                <div class="form-group">
-                    <label for="evaluation_method">Call Evaluation Method</label>
-                    <select id="evaluation_method" name="evaluation_method">
-                        <!-- Options loaded via JavaScript -->
-                    </select>
-                </div>
-            </div>
-
-            <button type="submit" class="create-btn" id="createBtn">Create Assistant</button>
-            
-            <div class="loading" id="loading">
-                <p>Creating your assistant...</p>
-            </div>
-            
-            <div class="result" id="result"></div>
-        </form>
     </div>
-
-    <!-- Include Supabase and Auth Helper -->
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="/js/auth-helper.js"></script>
     
     <script>
-        let questionCount = 0;
-        
-        // Initialize page
-        document.addEventListener('DOMContentLoaded', async function() {
-            // Check authentication first
-            const user = await requireAuth();
-            if (!user) return; // Will redirect to auth page
-            
-            // Update user email in nav
-            document.getElementById('userEmail').textContent = user.email;
-            
-            await loadConfig();
-            setupEventListeners();
-        });
-        
-        async function loadConfig() {
-            try {
-                // Load voices from public endpoint
-                const voiceResponse = await fetch('/api/config/voices');
-                const voiceData = await voiceResponse.json();
-                
-                // Load voice options
-                const voiceSelect = document.getElementById('voice_id');
-                if (voiceData.success) {
-                    voiceData.data.forEach(voice => {
-                    const option = document.createElement('option');
-                    option.value = voice.id;
-                    option.textContent = `${voice.name} - ${voice.description}`;
-                    voiceSelect.appendChild(option);
-                });
-                
-                // Load personality traits
-                const personalityGrid = document.getElementById('personalityGrid');
-                const traits = ['Professional', 'Friendly', 'Energetic', 'Calming', 'Confident', 'Empathetic', 'Witty', 'Patient', 'Knowledgeable', 'Supportive'];
-                
-                traits.forEach(trait => {
-                    const div = document.createElement('div');
-                    div.className = 'personality-option';
-                    div.innerHTML = `
-                        <input type="checkbox" id="trait_${trait.toLowerCase()}" name="personality_traits" value="${trait}">
-                        <label for="trait_${trait.toLowerCase()}">${trait}</label>
-                    `;
-                    personalityGrid.appendChild(div);
-                });
-                
-                // Load evaluation methods
-                const evalSelect = document.getElementById('evaluation_method');
-                const evaluationMethods = [
-                    { value: "NumericScale", label: "Numeric Scale (1-10)" },
-                    { value: "DescriptiveScale", label: "Descriptive (Excellent/Good/Fair/Poor)" },
-                    { value: "Checklist", label: "Checklist of Criteria" },
-                    { value: "BinaryEvaluation", label: "Binary (Success/Failure)" },
-                    { value: "NoEvaluation", label: "No Evaluation" }
-                ];
-                
-                evaluationMethods.forEach(method => {
-                    const option = document.createElement('option');
-                    option.value = method.value;
-                    option.textContent = method.label;
-                    evalSelect.appendChild(option);
-                });
-                
-            } catch (error) {
-                console.error('Error loading config:', error);
-            }
-        }
-        
-        function setupEventListeners() {
-            // Duration slider
-            const durationSlider = document.getElementById('max_call_duration');
-            const durationValue = document.getElementById('durationValue');
-            
-            durationSlider.addEventListener('input', function() {
-                const minutes = Math.floor(this.value / 60);
-                const seconds = this.value % 60;
-                durationValue.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
-            });
-            
-            // Form submission
-            document.getElementById('assistantForm').addEventListener('submit', handleFormSubmit);
-        }
-        
-        function addStructuredQuestion() {
-            questionCount++;
-            const container = document.getElementById('structuredQuestions');
-            
-            const questionDiv = document.createElement('div');
-            questionDiv.className = 'question-item';
-            questionDiv.innerHTML = `
-                <div class="question-header">
-                    <h4>Question ${questionCount}</h4>
-                    <button type="button" class="remove-question" onclick="removeQuestion(this)">Remove</button>
-                </div>
-                <div class="form-row">
-                    <div class="form-group">
-                        <label>Question</label>
-                        <input type="text" name="structured_questions[${questionCount}][question]" placeholder="What is your name?" required>
-                    </div>
-                    <div class="form-group">
-                        <label>Field Name</label>
-                        <input type="text" name="structured_questions[${questionCount}][field_name]" placeholder="customer_name">
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label>Description</label>
-                    <textarea name="structured_questions[${questionCount}][description]" placeholder="Description of what this question captures (e.g., Customer's full name for identification)" rows="2"></textarea>
-                </div>
-                <div class="form-row">
-                    <div class="form-group">
-                        <label>Type</label>
-                        <select name="structured_questions[${questionCount}][type]">
-                            <option value="string">Text</option>
-                            <option value="number">Number</option>
-                            <option value="boolean">Yes/No</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label>
-                            <input type="checkbox" name="structured_questions[${questionCount}][required]" value="true">
-                            Required
-                        </label>
-                    </div>
-                </div>
-            `;
-            
-            container.appendChild(questionDiv);
-        }
-        
-        function removeQuestion(button) {
-            button.closest('.question-item').remove();
-        }
-        
-        async function handleFormSubmit(e) {
-            e.preventDefault();
-            
-            const form = e.target;
-            const formData = new FormData(form);
-            
-            // Convert form data to JSON
-            const data = {};
-            
-            // Handle regular fields
-            for (let [key, value] of formData.entries()) {
-                if (key.includes('[') && key.includes(']')) {
-                    // Handle structured questions
-                    continue;
-                } else if (key === 'personality_traits') {
-                    if (!data.personality_traits) data.personality_traits = [];
-                    data.personality_traits.push(value);
-                } else {
-                    data[key] = value;
-                }
-            }
-            
-            // Handle structured questions
-            const structuredQuestions = [];
-            const questionInputs = form.querySelectorAll('input[name*="structured_questions"], textarea[name*="structured_questions"], select[name*="structured_questions"]');
-            const questionData = {};
-            
-            questionInputs.forEach(input => {
-                const match = input.name.match(/structured_questions\[(\d+)\]\[(\w+)\]/);
-                if (match) {
-                    const [, index, field] = match;
-                    if (!questionData[index]) questionData[index] = {};
-                    questionData[index][field] = input.type === 'checkbox' ? input.checked : input.value;
-                }
-            });
-            
-            // Convert to array
-            Object.values(questionData).forEach(q => {
-                if (q.question) structuredQuestions.push(q);
-            });
-            
-            data.structured_questions = structuredQuestions;
-            
-            // Show loading state
-            document.getElementById('createBtn').disabled = true;
-            document.getElementById('loading').style.display = 'block';
-            document.getElementById('result').style.display = 'none';
-            
-            try {
-                // Check if authenticatedFetch is available
-                if (typeof authenticatedFetch === 'undefined') {
-                    throw new Error('Authentication helper not loaded. Please refresh the page.');
-                }
-                
-                const response = await authenticatedFetch('/api/assistants', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(data)
-                });
-                
-                const result = await response.json();
-                
-                if (result.success) {
-                    showResult('success', `Assistant "${result.data.name}" created successfully! Assistant ID: ${result.data.vapi_assistant_id}`);
-                    form.reset();
-                    questionCount = 0;
-                    document.getElementById('structuredQuestions').innerHTML = '';
-                } else {
-                    showResult('error', `Error: ${result.error}`);
-                }
-                
-            } catch (error) {
-                console.error('Error:', error);
-                showResult('error', 'Failed to create assistant. Please try again.');
-            } finally {
-                document.getElementById('createBtn').disabled = false;
-                document.getElementById('loading').style.display = 'none';
-            }
-        }
-        
-        function showResult(type, message) {
-            const resultDiv = document.getElementById('result');
-            resultDiv.className = `result ${type}`;
-            resultDiv.textContent = message;
-            resultDiv.style.display = 'block';
-            
-            // Scroll to result
-            resultDiv.scrollIntoView({ behavior: 'smooth' });
-        }
+        // Redirect to new create-assistant page
+        setTimeout(() => {
+            window.location.href = '/create-assistant';
+        }, 1000);
     </script>
 </body>
 </html>

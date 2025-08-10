@@ -21,6 +21,24 @@ router.get('/', requireAuth, async (req, res) => {
     }
 });
 
+// GET /api/assistants/usage - Get user's call usage (MUST BE BEFORE /:id route)
+router.get('/usage', requireAuth, async (req, res) => {
+    try {
+        const usage = await assistantService.getUserCallUsage(req.userId);
+        
+        res.json({
+            success: true,
+            data: usage
+        });
+    } catch (error) {
+        console.error('Error fetching usage:', error);
+        res.status(500).json({
+            success: false,
+            error: 'Failed to fetch usage'
+        });
+    }
+});
+
 // GET /api/assistants/:id - Get specific assistant
 router.get('/:id', requireAuth, async (req, res) => {
     try {
@@ -104,24 +122,6 @@ router.delete('/:id', requireAuth, async (req, res) => {
         res.status(500).json({
             success: false,
             error: 'Failed to delete assistant'
-        });
-    }
-});
-
-// GET /api/assistants/usage - Get user's call usage
-router.get('/usage', requireAuth, async (req, res) => {
-    try {
-        const usage = await assistantService.getUserCallUsage(req.userId);
-        
-        res.json({
-            success: true,
-            data: usage
-        });
-    } catch (error) {
-        console.error('Error fetching usage:', error);
-        res.status(500).json({
-            success: false,
-            error: 'Failed to fetch usage'
         });
     }
 });
