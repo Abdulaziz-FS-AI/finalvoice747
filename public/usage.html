@@ -25,8 +25,55 @@
         }
         
         .header {
-            text-align: center;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
             margin-bottom: 40px;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+        
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .user-email {
+            color: #666;
+            font-size: 0.9em;
+        }
+        
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9em;
+            text-decoration: none;
+            display: inline-block;
+            transition: all 0.2s ease;
+        }
+        
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+        
+        .btn-danger:hover {
+            background: #c82333;
+        }
+        
+        .btn-sm {
+            padding: 6px 12px;
+            font-size: 0.8em;
+        }
+        
+        @media (max-width: 768px) {
+            .header {
+                flex-direction: column;
+                text-align: center;
+            }
         }
         
         .header h1 {
@@ -306,13 +353,19 @@
         <div class="header">
             <h1>Usage Dashboard</h1>
             <p>Monitor your AI assistant usage and limits</p>
+            <div class="user-info">
+                <span class="user-email" id="userEmail">Loading...</span>
+                <button class="btn btn-danger btn-sm" onclick="signOut()">Sign Out</button>
+            </div>
         </div>
 
         <div class="nav-links">
-            <a href="/index.html" class="nav-link">Create Assistant</a>
-            <a href="/assistants.html" class="nav-link">Manage Assistants</a>
-            <a href="/phone-numbers.html" class="nav-link">Phone Numbers</a>
-            <a href="/analytics.html" class="nav-link">Call Analytics</a>
+            <a href="/dashboard" class="nav-link">Dashboard</a>
+            <a href="/create-assistant" class="nav-link">Create Assistant</a>
+            <a href="/assistants" class="nav-link">Assistants</a>
+            <a href="/phone-numbers" class="nav-link">Phone Numbers</a>
+            <a href="/analytics" class="nav-link">Analytics</a>
+            <a href="/usage" class="nav-link" style="background: #444; color: white;">Usage</a>
         </div>
 
         <div class="loading" id="loading">
@@ -398,16 +451,109 @@
         </div>
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
+        let supabaseClient = null;
+        let currentUser = null;
         let usageData = null;
         
         // Initialize page
-        document.addEventListener('DOMContentLoaded', function() {
-            loadUsageData();
-            
-            // Auto-refresh every 30 seconds
-            setInterval(loadUsageData, 30000);
+        document.addEventListener('DOMContentLoaded', async function() {
+            try {
+                await initSupabase();
+                currentUser = await requireAuth();
+                if (!currentUser) return;
+                
+                // Update user email in header
+                document.getElementById('userEmail').textContent = currentUser.email;
+                
+                await loadUsageData();
+                
+                // Auto-refresh every 30 seconds
+                setInterval(loadUsageData, 30000);
+            } catch (error) {
+                console.error('Initialization error:', error);
+                showError('Failed to initialize page: ' + error.message);
+            }
         });
+        
+        // Initialize Supabase
+        async function initSupabase() {
+            try {
+                const response = await fetch('/api/config/auth');
+                const config = await response.json();
+                
+                if (response.ok) {
+                    const { createClient } = supabase;
+                    supabaseClient = createClient(config.supabaseUrl, config.supabaseAnonKey);
+                } else {
+                    throw new Error(config.message || 'Failed to load auth config');
+                }
+            } catch (error) {
+                console.error('Supabase init error:', error);
+                throw error;
+            }
+        }
+        
+        // Require authentication
+        async function requireAuth() {
+            if (!supabaseClient) {
+                throw new Error('Supabase not initialized');
+            }
+            
+            const { data: { user }, error } = await supabaseClient.auth.getUser();
+            
+            if (error || !user) {
+                console.log('User not authenticated, redirecting...');
+                window.location.href = '/auth';
+                return null;
+            }
+            
+            return user;
+        }
+        
+        // Sign out function
+        async function signOut() {
+            try {
+                await supabaseClient.auth.signOut();
+                window.location.href = '/auth';
+            } catch (error) {
+                console.error('Sign out error:', error);
+            }
+        }
+        
+        // Authenticated fetch
+        async function authenticatedFetch(url, options = {}) {
+            if (!supabaseClient) {
+                throw new Error('Not authenticated');
+            }
+            
+            const { data: { session } } = await supabaseClient.auth.getSession();
+            if (!session) {
+                window.location.href = '/auth';
+                return null;
+            }
+            
+            return fetch(url, {
+                ...options,
+                headers: {
+                    ...options.headers,
+                    'Authorization': `Bearer ${session.access_token}`
+                }
+            });
+        }
+        
+        // Show error message
+        function showError(message) {
+            const loading = document.getElementById('loading');
+            const content = document.getElementById('content');
+            const errorMessage = document.getElementById('errorMessage');
+            
+            loading.style.display = 'none';
+            content.style.display = 'none';
+            errorMessage.style.display = 'block';
+            errorMessage.textContent = message;
+        }
         
         async function loadUsageData() {
             const loading = document.getElementById('loading');
@@ -419,7 +565,8 @@
                 content.style.display = 'none';
                 errorMessage.style.display = 'none';
                 
-                const response = await fetch('/api/user/limits');
+                const response = await authenticatedFetch('/api/user/limits');
+                if (!response) return; // Authentication failed
                 const result = await response.json();
                 
                 if (result.success) {
@@ -434,7 +581,7 @@
                 
             } catch (error) {
                 console.error('Error loading usage data:', error);
-                errorMessage.style.display = 'block';
+                showError('Failed to load usage data. Please refresh the page or try again later.');
             } finally {
                 loading.style.display = 'none';
             }
@@ -551,7 +698,8 @@
         
         async function loadUsageHistory() {
             try {
-                const response = await fetch('/api/user/usage-history?limit=10');
+                const response = await authenticatedFetch('/api/user/usage-history?limit=10');
+                if (!response) return; // Authentication failed
                 const result = await response.json();
                 
                 if (result.success) {

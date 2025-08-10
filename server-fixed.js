@@ -102,6 +102,17 @@ app.get('/create-assistant', (req, res) => {
     });
 });
 
+// Usage route
+app.get('/usage', (req, res) => {
+    console.log('📈 Serving usage page');
+    res.sendFile(path.join(__dirname, 'public', 'usage.html'), (err) => {
+        if (err) {
+            console.error('❌ Error serving usage page:', err);
+            res.status(500).send('Error loading usage page');
+        }
+    });
+});
+
 // Static files for any other assets (images, etc.)
 app.use(express.static(path.join(__dirname, 'public')));
 
@@ -195,7 +206,16 @@ try {
     console.warn('⚠️ Could not load VAPI webhook routes:', err.message);
 }
 
-console.log(`📊 Loaded ${apiRoutesLoaded}/5 API route modules`);
+try {
+    const userRoutes = require('./api/user');
+    app.use('/api/user', userRoutes);
+    apiRoutesLoaded++;
+    console.log('✅ User routes loaded');
+} catch (err) {
+    console.warn('⚠️ Could not load user routes:', err.message);
+}
+
+console.log(`📊 Loaded ${apiRoutesLoaded}/6 API route modules`);
 
 // Health check
 app.get('/health', (req, res) => {
